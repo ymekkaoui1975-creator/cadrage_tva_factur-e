@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-3qA6smOE2d3Qj03knm1nHcP9OX1mZ3MbaJtL+5qwfyg='; style-src 'sha256-fLc9A4f8pHBXDYDP4ZxW0MOiZvN5KbHM5TWXKrqdB10='; img-src 'self' data: blob:; connect-src 'self'; font-src 'none'; object-src 'none'; media-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; form-action 'none'; base-uri 'none'; require-trusted-types-for 'script'; trusted-types 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Cadrage de la TVA facturée (collectée) à partir du grand livre – exigibilité, déclarations, retenue à la source – traitement 100 % local.">
+<meta name="theme-color" content="#cbbdf7">
+<title>Cadrage TVA facturée – Analyse du grand livre</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23b9a7f5'/%3E%3Cstop offset='.5' stop-color='%23f6a8c6'/%3E%3Cstop offset='1' stop-color='%23ffc29a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='10' fill='url(%23g)'/%3E%3Ctext x='16' y='21' font-family='Arial' font-size='11' font-weight='800' fill='%232b2540' text-anchor='middle'%3ETVA%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#fbf8f4;--surface:#ffffff;--surface-2:#f7f3fc;--border:#ece5f5;--text:#2b2540;--muted:#7a7290;
+  --lav:#cbbdf7;--lav-d:#6f5fd0;--mint:#bfead7;--mint-d:#23885f;--peach:#ffd8bd;--peach-d:#c8642a;--rose:#f9c9db;--rose-d:#c2457a;--sky:#c6e3f8;--sky-d:#2f7fb8;--lemon:#fbeaa8;--lemon-d:#9a7a0a;
+  --hero:linear-gradient(120deg,#e8ddff 0%,#fbdcea 48%,#ffe8d4 100%);
+  --ok:#23885f;--ok-bg:#dcf5ea;--ko:#c2457a;--ko-bg:#fde3ee;--warn:#c8642a;--warn-bg:#ffeadb;--info:#6f5fd0;--info-bg:#ece6ff;
+  --shadow:0 1px 2px rgba(43,37,64,.04),0 10px 30px rgba(111,95,208,.08);--shadow-lg:0 18px 50px rgba(111,95,208,.16);
+  --radius:20px;--font:"Inter","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;--mono:ui-monospace,"SF Mono",Consolas,monospace;
+  --c-fact:#b9a7f5;--c-exig:#8fd8b8;--c-decl:#ffc29a;--c-ecart:#e57aa3;
+}
+[data-theme="dark"]{
+  --bg:#16131f;--surface:#1f1b2b;--surface-2:#28233a;--border:#363049;--text:#efeaf8;--muted:#aaa1c2;
+  --hero:linear-gradient(120deg,#3a2f63 0%,#4a2a45 50%,#4d3427 100%);
+  --ok:#7fdcb3;--ok-bg:#1d3a2e;--ko:#f5a3c4;--ko-bg:#45213a;--warn:#ffbe90;--warn-bg:#47301f;--info:#c4b6ff;--info-bg:#2f2752;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);--shadow-lg:0 18px 50px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.framed body{display:none}
+a{color:var(--lav-d)}
+[data-theme="dark"] a{color:var(--info)}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--lav-d);outline-offset:2px;border-radius:10px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:-999px;top:8px;background:var(--lav-d);color:#fff;padding:8px 12px;border-radius:8px;z-index:100}
+.skip:focus{left:8px}
+[hidden]{display:none!important}
+
+.topbar{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--surface) 82%,transparent);backdrop-filter:saturate(1.3) blur(14px);border-bottom:1px solid var(--border)}
+.topbar-in{max-width:1480px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;gap:14px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#b9a7f5,#f6a8c6 55%,#ffc29a);display:grid;place-items:center;flex:none;font-weight:900;font-size:12px;color:#2b2540;box-shadow:0 6px 18px rgba(185,167,245,.45)}
+.brand h1{font-size:16px;margin:0;white-space:nowrap;letter-spacing:-.2px}
+.brand p{margin:0;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:440px}
+.spacer{flex:1}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--border);background:var(--surface);padding:8px 15px;border-radius:12px;cursor:pointer;font-weight:650;font-size:13px;transition:transform .08s,box-shadow .2s,background .2s;text-decoration:none;color:var(--text);white-space:nowrap}
+.btn:hover{background:var(--surface-2);box-shadow:0 4px 14px rgba(111,95,208,.12)}
+.btn:active{transform:translateY(1px)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.btn-main{background:var(--lav-d);border-color:var(--lav-d);color:#fff}
+.btn-main:hover{background:#5e4ec2}
+.btn-soft{background:var(--info-bg);border-color:transparent;color:var(--lav-d)}
+[data-theme="dark"] .btn-soft{color:var(--info)}
+.btn-ghost{border-color:transparent;background:transparent}
+.btn-sm{padding:6px 11px;font-size:12px;border-radius:10px}
+.ico{width:16px;height:16px;flex:none}
+main{max-width:1480px;margin:0 auto;padding:22px 24px}
+
+.hero{position:relative;overflow:hidden;border-radius:28px;background:var(--hero);padding:36px 38px;margin-bottom:22px;display:grid;grid-template-columns:1.25fr 1fr;gap:30px;align-items:center;box-shadow:var(--shadow)}
+.hero .blob{position:absolute;border-radius:50%;filter:blur(30px);opacity:.55;pointer-events:none}
+.hero .b1{width:260px;height:260px;background:#cbbdf7;right:8%;top:-90px}
+.hero .b2{width:200px;height:200px;background:#bfead7;left:35%;bottom:-110px}
+.hero .b3{width:160px;height:160px;background:#ffd8bd;right:-40px;bottom:-40px}
+.hero>*{position:relative}
+.hero .eyebrow{display:inline-flex;gap:8px;align-items:center;font-size:12px;font-weight:750;color:var(--lav-d);background:rgba(255,255,255,.65);padding:5px 12px;border-radius:999px;margin-bottom:12px}
+[data-theme="dark"] .hero .eyebrow{background:rgba(0,0,0,.25);color:var(--info)}
+.hero h2{font-size:32px;line-height:1.15;margin:0 0 10px;letter-spacing:-.7px}
+.hero p{margin:0 0 18px;color:var(--muted);font-size:15px;max-width:620px}
+.hero .cta{display:flex;gap:10px;flex-wrap:wrap}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.pill-g{font-size:12px;font-weight:650;background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.9);padding:5px 11px;border-radius:999px}
+[data-theme="dark"] .pill-g{background:rgba(0,0,0,.22);border-color:rgba(255,255,255,.12)}
+.drop{position:relative;border:2px dashed color-mix(in srgb,var(--lav-d) 45%,transparent);border-radius:24px;background:rgba(255,255,255,.6);padding:30px;text-align:center;cursor:pointer;transition:background .2s,transform .2s,border-color .2s}
+[data-theme="dark"] .drop{background:rgba(0,0,0,.2)}
+.drop:hover,.drop.drag{background:rgba(255,255,255,.85);transform:translateY(-2px);border-color:var(--lav-d)}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.drop .big{width:66px;height:66px;border-radius:20px;background:linear-gradient(135deg,#cbbdf7,#f9c9db);display:grid;place-items:center;margin:0 auto 12px;color:#4b3fa8}
+.drop b{display:block;font-size:17px;margin-bottom:4px}
+.drop small{color:var(--muted)}
+.hero.compact{grid-template-columns:1fr auto;padding:16px 22px;border-radius:20px}
+.hero.compact h2{font-size:18px;margin:0}
+.hero.compact p,.hero.compact .pills,.hero.compact .cta,.hero.compact .eyebrow,.hero.compact .drop small{display:none}
+.hero.compact .drop{padding:10px 18px;display:flex;align-items:center;gap:12px;text-align:left}
+.hero.compact .drop .big{width:36px;height:36px;margin:0;border-radius:12px}
+.hero.compact .drop b{font-size:14px;margin:0}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.progress{display:none;padding:16px 20px;margin-bottom:18px}
+.progress.show{display:block}
+.bar{height:6px;background:var(--surface-2);border-radius:999px;overflow:hidden;margin-top:10px}
+.bar>i{display:block;height:100%;width:30%;background:linear-gradient(90deg,#b9a7f5,#f6a8c6,#ffc29a);border-radius:999px;animation:load 1.1s ease-in-out infinite}
+@keyframes load{0%{transform:translateX(-100%)}100%{transform:translateX(340%)}}
+.fileinfo{display:none;padding:12px 16px;margin-bottom:18px;align-items:center;gap:10px;flex-wrap:wrap}
+.fileinfo.show{display:flex}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:4px 12px;font-size:12px;color:var(--muted)}
+.chip b{color:var(--text);font-weight:650}
+.banner{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-radius:16px;margin:0 0 16px;background:var(--info-bg);color:var(--info);font-size:13px;font-weight:600}
+.banner.warn{background:var(--warn-bg);color:var(--warn)}
+
+.tabs{display:none;gap:6px;margin-bottom:20px;overflow-x:auto;padding:6px;background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);scrollbar-width:thin}
+.tabs.show{display:flex}
+.tab{border:0;background:transparent;padding:9px 14px;cursor:pointer;font-weight:650;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:8px;border-radius:13px;transition:background .2s,color .2s}
+.tab:hover{color:var(--text);background:var(--surface-2)}
+.tab[aria-selected="true"]{color:#3c2f99;background:var(--lav);box-shadow:0 4px 14px rgba(185,167,245,.5)}
+[data-theme="dark"] .tab[aria-selected="true"]{color:#1f1b2b}
+.count{font-size:11px;padding:1px 7px;border-radius:999px;background:var(--surface-2);color:var(--muted);font-weight:800}
+.tab[aria-selected="true"] .count{background:rgba(255,255,255,.6);color:#3c2f99}
+.count.ko{background:var(--ko-bg);color:var(--ko)}
+.panel{display:none}
+.panel.show{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.panel-head{display:flex;align-items:flex-end;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.panel-head h2{margin:0;font-size:22px;letter-spacing:-.3px}
+.panel-head p{margin:4px 0 0;color:var(--muted);max-width:920px}
+
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:18px}
+.kpi{position:relative;overflow:hidden;padding:18px 18px 16px;background:var(--surface)}
+.kpi::after{content:"";position:absolute;width:120px;height:120px;border-radius:50%;right:-40px;top:-50px;background:var(--pc,var(--lav));opacity:.45}
+.kpi>*{position:relative}
+.kpi .top{display:flex;align-items:center;gap:10px}
+.kpi .ic{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--pc,var(--lav));color:var(--pd,var(--lav-d))}
+.kpi .l{color:var(--muted);font-size:12px;font-weight:750;text-transform:uppercase;letter-spacing:.4px}
+.kpi .v{font-size:25px;font-weight:800;margin-top:10px;font-variant-numeric:tabular-nums;letter-spacing:-.6px}
+.kpi .v small{font-size:13px;font-weight:700;color:var(--muted);margin-left:4px}
+.kpi .s{color:var(--muted);font-size:12px;margin-top:2px}
+.kpi.ok .v{color:var(--ok)}.kpi.ko .v{color:var(--ko)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.grid3{display:grid;grid-template-columns:1.9fr 1.1fr;gap:18px;margin-bottom:18px}
+.sec{padding:18px 20px}
+.sec h3{margin:0 0 4px;font-size:15px}
+.sec .sub{color:var(--muted);font-size:12px;margin:0 0 12px}
+.chart svg{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-size:11px;font-family:var(--font)}
+.chart .strong{fill:var(--text);font-weight:800}
+.chart .grid{stroke:var(--border);stroke-width:1}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:4px;background:var(--c)}
+.donut-wrap{display:grid;grid-template-columns:190px 1fr;gap:16px;align-items:center}
+.blist{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.blist li{display:grid;grid-template-columns:12px 1fr auto;gap:10px;align-items:center;font-size:13px;white-space:nowrap}
+.blist i{width:12px;height:12px;border-radius:4px;background:var(--c)}
+.blist .am{font-weight:700;font-variant-numeric:tabular-nums}
+.checks{list-style:none;margin:0;padding:0}
+.checks li{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--border)}
+.checks li:first-child{border-top:0}
+.checks .t{flex:1}
+.checks .t small{display:block;color:var(--muted)}
+.checks .amt{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.dot{width:26px;height:26px;border-radius:9px;display:grid;place-items:center;flex:none;font-weight:900;font-size:13px}
+.d-ok{background:var(--ok-bg);color:var(--ok)}.d-ko{background:var(--ko-bg);color:var(--ko)}.d-warn{background:var(--warn-bg);color:var(--warn)}.d-info{background:var(--info-bg);color:var(--info)}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:stretch}
+.flow .st{padding:14px;border-radius:16px;background:var(--surface-2);text-align:center}
+.flow .st b{display:block;font-size:17px;font-variant-numeric:tabular-nums;margin-top:4px}
+.flow .st small{color:var(--muted);font-size:11.5px;font-weight:650;text-transform:uppercase;letter-spacing:.3px}
+.flow .op{display:grid;place-items:center;font-size:22px;font-weight:800;color:var(--muted)}
+.flow .eq{background:var(--lav)}
+[data-theme="dark"] .flow .eq{color:#1f1b2b}
+[data-theme="dark"] .flow .eq small{color:#3c2f99}
+
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.search{position:relative;flex:1;min-width:220px;max-width:360px}
+.search input{width:100%;padding:9px 12px 9px 34px;border:1px solid var(--border);border-radius:12px;background:var(--surface)}
+.search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.toolbar select{padding:8px 10px;border:1px solid var(--border);border-radius:12px;background:var(--surface)}
+.toolbar label.ck{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted);cursor:pointer}
+.tablewrap{overflow:auto;max-height:72vh;border:1px solid var(--border);border-radius:16px;background:var(--surface)}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:13px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:left;vertical-align:middle}
+th{position:sticky;top:0;background:var(--surface-2);font-weight:750;font-size:11.5px;color:var(--muted);z-index:2;white-space:nowrap;cursor:pointer;user-select:none;text-transform:uppercase;letter-spacing:.3px}
+th.nosort{cursor:default}
+th[aria-sort="ascending"]::after{content:" ▲";font-size:9px}
+th[aria-sort="descending"]::after{content:" ▼";font-size:9px}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.wrap{min-width:240px;max-width:460px}
+td.nowrap{white-space:nowrap}
+td.mono{font-family:var(--mono);font-size:12px}
+.tablewrap tbody td:first-child{white-space:nowrap}
+tbody tr:hover td{background:color-mix(in srgb,var(--lav) 14%,var(--surface))}
+tr.ko td{background:color-mix(in srgb,var(--rose) 30%,var(--surface))}
+tr.warn td{background:color-mix(in srgb,var(--peach) 30%,var(--surface))}
+tr.tot td{font-weight:800;background:var(--surface-2);position:sticky;bottom:0;z-index:1}
+tr.sub td{font-weight:700;background:var(--surface-2)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.b-ok{background:var(--ok-bg);color:var(--ok)}.b-ko{background:var(--ko-bg);color:var(--ko)}.b-warn{background:var(--warn-bg);color:var(--warn)}.b-info{background:var(--info-bg);color:var(--info)}.b-mute{background:var(--surface-2);color:var(--muted)}
+.foot{color:var(--muted);font-size:12px;margin-top:8px}
+.live{width:140px;text-align:right;padding:6px 9px;border:1.5px solid var(--lav);border-radius:10px;background:color-mix(in srgb,var(--lemon) 35%,var(--surface));font-variant-numeric:tabular-nums;font-weight:700}
+.live:focus{border-color:var(--lav-d);background:var(--surface)}
+.live.changed{border-color:var(--peach-d)}
+.anos{display:grid;gap:14px}
+.ano{padding:18px 20px;display:grid;grid-template-columns:auto 1fr auto;gap:16px;border-left:6px solid var(--border)}
+.ano.s-high{border-left-color:var(--rose-d)}.ano.s-mid{border-left-color:var(--peach-d)}.ano.s-low{border-left-color:var(--sky-d)}.ano.s-ok{border-left-color:var(--mint-d)}
+.ano .n{font-size:22px;font-weight:800;color:var(--muted);width:32px}
+.ano h3{margin:0 0 6px;font-size:15px}
+.ano p{margin:4px 0}
+.ano .lbl{font-weight:750;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.3px;margin-top:8px;display:block}
+.ano .right{text-align:right;min-width:150px}
+.ano .amt{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:8px}
+.ano .ref{font-size:12px;color:var(--muted);margin-top:6px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.pill{border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:6px 13px;font-size:12px;font-weight:650;cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--lav);border-color:var(--lav);color:#3c2f99}
+.form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.field label{display:block;font-weight:700;font-size:12px;color:var(--muted);margin-bottom:5px}
+.field input,.field select{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:11px;background:var(--surface)}
+.field small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.form-actions{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.rule{padding:16px;border-radius:16px}
+.rule:nth-child(1){background:color-mix(in srgb,var(--lav) 40%,var(--surface))}.rule:nth-child(2){background:color-mix(in srgb,var(--mint) 45%,var(--surface))}.rule:nth-child(3){background:color-mix(in srgb,var(--peach) 45%,var(--surface))}
+.rule b{display:block;font-size:18px;margin-bottom:4px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:6px}
+.step{padding:18px}
+.step .n{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:11px;font-weight:800;margin-bottom:10px;color:#2b2540}
+.step:nth-child(1) .n{background:var(--lav)}.step:nth-child(2) .n{background:var(--mint)}.step:nth-child(3) .n{background:var(--peach)}.step:nth-child(4) .n{background:var(--rose)}
+.step b{display:block;margin-bottom:4px}
+.step span.t{color:var(--muted)}
+.toasts{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:10px;z-index:60}
+.toast{background:var(--surface);border:1px solid var(--border);border-left:6px solid var(--lav-d);border-radius:14px;padding:12px 16px;box-shadow:var(--shadow-lg);max-width:420px;animation:fade .2s ease}
+.toast.err{border-left-color:var(--rose-d)}.toast.ok{border-left-color:var(--mint-d)}
+footer{max-width:1480px;margin:0 auto;padding:10px 24px 30px;color:var(--muted);font-size:12px}
+footer a{margin-left:6px}
+@media (max-width:1180px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2,.grid3,.hero{grid-template-columns:1fr}.form{grid-template-columns:repeat(2,1fr)}.steps{grid-template-columns:repeat(2,1fr)}.rules{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.flow .op{padding:2px}}
+@media (max-width:640px){main{padding:14px}.topbar-in{padding:8px 14px;flex-wrap:wrap}.kpis{grid-template-columns:1fr}.form{grid-template-columns:1fr}.brand p{display:none}.hero{padding:24px}.hero h2{font-size:24px}.donut-wrap{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.ano{grid-template-columns:1fr}.ano .right{text-align:left}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{
+  body{background:#fff}
+  .topbar,.hero,.tabs,.toolbar,.toasts,.progress,.skip,.filters,#p-params,footer{display:none!important}
+  .panel{display:block!important;break-before:page}#p-dash{break-before:auto}
+  .card{box-shadow:none}.tablewrap{max-height:none;overflow:visible}th{position:static}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar"><div class="topbar-in">
+  <div class="brand"><div class="logo" aria-hidden="true">TVA</div><div><h1>Cadrage TVA facturée</h1><p id="subtitle">TVA collectée · exigibilité · déclarations · retenue à la source</p></div></div>
+  <div class="spacer"></div>
+  <div class="actions">
+    <button class="btn btn-main" id="btn-export" disabled><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>Exporter Excel</button>
+    <button class="btn" id="btn-print" disabled>Imprimer</button>
+    <button class="btn" id="btn-reset" disabled>Effacer</button>
+    <button class="btn btn-ghost" id="btn-theme" aria-label="Basculer le thème clair / sombre"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+  </div>
+</div></header>
+
+<main id="main">
+  <section class="hero" id="hero" aria-label="Chargement du grand livre">
+    <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+    <div>
+      <span class="eyebrow">✦ Cadrage fiscal automatisé</span>
+      <h2 id="hero-title">Votre TVA facturée, cadrée au centime</h2>
+      <p>Ventilation par taux, exigibilité à l'encaissement, rapprochement avec chaque déclaration, retenue à la source et solde du compte 4455 – directement depuis votre grand livre.</p>
+      <div class="cta">
+        <button class="btn btn-main" id="btn-demo"><svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>Essayer avec la société de démonstration</button>
+        <a class="btn" href="Grand_livre_exemple_TVA.xlsx" download>Télécharger le grand livre exemple</a>
+      </div>
+      <div class="pills"><span class="pill-g">🔒 100 % local</span><span class="pill-g">✏️ Cellules de saisie vivantes</span><span class="pill-g">🇲🇦 CGI art. 95, 98-99, 117</span><span class="pill-g">📊 Export Excel</span></div>
+    </div>
+    <div class="drop" id="drop">
+      <input type="file" id="file" accept=".xlsx,.xlsm,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" aria-label="Choisir le fichier du grand livre">
+      <div class="big" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 16V4m0 0-4 4m4-4 4 4M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg></div>
+      <b id="drop-title">Déposez votre grand livre ici</b>
+      <small>ou cliquez pour le choisir · .xlsx ou .csv · 25 Mo max · export « grand livre global » avec lettrage</small>
+    </div>
+  </section>
+  <section class="card progress" id="progress" aria-live="polite"><b id="progress-txt">Lecture du fichier…</b><div class="bar"><i></i></div></section>
+  <section class="card fileinfo" id="fileinfo" aria-label="Informations sur le fichier chargé"></section>
+  <section id="empty"><div class="steps">
+    <div class="card step"><span class="n">1</span><b>Chargez</b><span class="t">L'export du grand livre de la période, avec le lettrage des comptes clients.</span></div>
+    <div class="card step"><span class="n">2</span><b>Cadrez</b><span class="t">CA × taux, ventilation 20 % / 10 % / export, compte 4455.</span></div>
+    <div class="card step"><span class="n">3</span><b>Rapprochez</b><span class="t">TVA exigible de chaque mois avec la TVA déclarée (cellules modifiables).</span></div>
+    <div class="card step"><span class="n">4</span><b>Corrigez</b><span class="t">Anomalies classées, écritures proposées, export Excel complet.</span></div>
+  </div></section>
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Feuilles d'analyse"></nav>
+  <section class="panel" id="p-dash" role="tabpanel" tabindex="0"></section>
+  <section class="panel" id="p-docs" role="tabpanel" tabindex="0"></section>
+  <section class="panel" id="p-rates" role="tabpanel" tabindex="0"></section>
+  <section class="panel" id="p-enc" role="tabpanel" tabindex="0"></section>
+  <section class="panel" id="p-decl" role="tabpanel" tabindex="0"></section>
+  <section class="panel" id="p-solde" role="tabpanel" tabindex="0"></section>
+  <section class="panel" id="p-ras" role="tabpanel" tabindex="0"></section>
+  <section class="panel" id="p-anos" role="tabpanel" tabindex="0"></section>
+  <section class="panel" id="p-params" role="tabpanel" tabindex="0"></section>
+</main>
+<footer>Outil d'aide au cadrage : les conclusions fiscales sont à valider au regard des factures, des déclarations déposées et des textes en vigueur. Traitement 100 % local, aucune donnée transmise.<a href="Grand_livre_exemple_TVA.xlsx" download>Grand livre exemple (société fictive)</a></footer>
+<div class="toasts" id="toasts" aria-live="assertive"></div>
+<div class="sr-only" id="live" aria-live="polite"></div>
+
+<script>
+'use strict';
+(() => {
+if (window.top !== window.self) { document.documentElement.classList.add('framed'); return; }
+const LIMITS = { fileBytes: 25 * 1024 * 1024, unzipBytes: 200 * 1024 * 1024, zipEntries: 5000, rows: 400000 };
+/* ============================ 1. Utilitaires ============================ */
+const $ = (s, r = document) => r.querySelector(s);
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  if (attrs) for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k === 'class') el.className = v;
+    else if (k === 'text') el.textContent = v;
+    else if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? '' : String(v));
+  }
+  for (const k of kids.flat(Infinity)) { if (k == null || k === false) continue; el.append(k instanceof Node ? k : document.createTextNode(String(k))); }
+  return el;
+}
+const SVGNS = 'http://www.w3.org/2000/svg';
+function s(tag, attrs, ...kids) { const el = document.createElementNS(SVGNS, tag); for (const [k, v] of Object.entries(attrs || {})) if (v != null) el.setAttribute(k, String(v)); for (const k of kids.flat()) if (k != null) el.append(k instanceof Node ? k : document.createTextNode(String(k))); return el; }
+const clear = el => { while (el.firstChild) el.removeChild(el.firstChild); return el; };
+const NF = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const NF0 = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+const r2 = x => Math.round((x + (x >= 0 ? 1 : -1) * 1e-9) * 100) / 100;
+const fmt = n => (n == null || n === '' || Number.isNaN(n)) ? '' : (Math.abs(n) < 0.005 ? '–' : NF.format(n));
+const fmt0 = n => (n == null || !isFinite(n)) ? '' : NF0.format(n);
+const fmtK = n => { const a = Math.abs(n); return a >= 1e6 ? (n / 1e6).toFixed(2).replace('.', ',') + ' M' : a >= 1e3 ? NF0.format(n / 1e3) + ' k' : NF0.format(n); };
+const fmtP = (n, d = 1) => (n == null || !isFinite(n)) ? '' : (n * 100).toFixed(d).replace('.', ',') + ' %';
+const fmtD = iso => iso ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(0, 4)}` : '';
+const sum = (arr, f) => arr.reduce((t, x) => t + (f ? f(x) : x), 0);
+const sw = (a, p) => !!a && !!p && String(a).startsWith(p);
+const swAny = (a, list) => list.some(p => sw(a, p));
+const norm = x => String(x ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const DAY = 86400000;
+const isoToMs = iso => Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10));
+const msToIso = ms => new Date(ms).toISOString().slice(0, 10);
+const addDays = (iso, n) => msToIso(isoToMs(iso) + n * DAY);
+const diffDays = (a, b) => Math.round((isoToMs(a) - isoToMs(b)) / DAY);
+const todayIso = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const MONTHS = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+function toast(msg, kind = '') { const t = h('div', { class: 'toast ' + kind, role: kind === 'err' ? 'alert' : 'status' }, msg); $('#toasts').append(t); setTimeout(() => t.remove(), kind === 'err' ? 9000 : 4200); }
+const announce = m => { $('#live').textContent = m; };
+
+/* ============================ 2. Lecture XLSX native ============================ */
+async function inflateRaw(u8, max) {
+  if (typeof DecompressionStream === 'undefined') throw new Error('Navigateur trop ancien : utilisez une version récente de Chrome, Edge, Firefox ou Safari.');
+  const reader = new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate-raw')).getReader();
+  const chunks = []; let total = 0;
+  for (;;) { const { done, value } = await reader.read(); if (done) break; total += value.length; if (total > max) { try { await reader.cancel(); } catch (_) {} throw new Error('Contenu décompressé trop volumineux : fichier refusé.'); } chunks.push(value); }
+  const out = new Uint8Array(total); let o = 0; for (const c of chunks) { out.set(c, o); o += c.length; } return out;
+}
+async function openZip(buf) {
+  const u8 = new Uint8Array(buf), dv = new DataView(buf);
+  if (u8.length < 22 || dv.getUint32(0, true) !== 0x04034b50) throw new Error("Ce fichier n'est pas un classeur Excel .xlsx valide. Un ancien .xls doit être réenregistré en .xlsx.");
+  let eocd = -1; for (let i = u8.length - 22; i >= Math.max(0, u8.length - 65557); i--) if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  if (eocd < 0) throw new Error('Archive Excel corrompue.');
+  const n = dv.getUint16(eocd + 10, true), cdOff = dv.getUint32(eocd + 16, true);
+  if (n > LIMITS.zipEntries || cdOff === 0xFFFFFFFF || cdOff >= u8.length) throw new Error('Structure de classeur non prise en charge.');
+  const entries = new Map(); let p = cdOff; const td = new TextDecoder();
+  for (let i = 0; i < n; i++) {
+    if (p + 46 > u8.length || dv.getUint32(p, true) !== 0x02014b50) throw new Error('Archive Excel corrompue (répertoire).');
+    const method = dv.getUint16(p + 10, true), csize = dv.getUint32(p + 20, true), nl = dv.getUint16(p + 28, true), el = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), loff = dv.getUint32(p + 42, true);
+    entries.set(td.decode(u8.subarray(p + 46, p + 46 + nl)), { method, csize, loff }); p += 46 + nl + el + cl;
+  }
+  let budget = LIMITS.unzipBytes;
+  return { async text(name) {
+    const e = entries.get(name); if (!e) return null; const l = e.loff;
+    if (l + 30 > u8.length || dv.getUint32(l, true) !== 0x04034b50) throw new Error('Archive Excel corrompue (entrée).');
+    const start = l + 30 + dv.getUint16(l + 26, true) + dv.getUint16(l + 28, true);
+    if (start + e.csize > u8.length) throw new Error('Archive Excel tronquée.');
+    const data = u8.subarray(start, start + e.csize); let out;
+    if (e.method === 0) out = data; else if (e.method === 8) out = await inflateRaw(data, budget); else throw new Error('Méthode de compression non prise en charge.');
+    budget -= out.length; if (budget < 0) throw new Error('Contenu décompressé trop volumineux : fichier refusé.');
+    return new TextDecoder('utf-8').decode(out);
+  } };
+}
+const ENT = { lt: '<', gt: '>', amp: '&', quot: '"', apos: "'" };
+function decodeXml(x) {
+  return x.replace(/&(#x[0-9a-f]+|#\d+|lt|gt|amp|quot|apos);/gi, (m, g) => { if (g[0] === '#') { const cp = g[1] === 'x' || g[1] === 'X' ? parseInt(g.slice(2), 16) : parseInt(g.slice(1), 10); return cp > 0 && cp < 0x110000 ? String.fromCodePoint(cp) : ''; } return ENT[g.toLowerCase()] ?? m; })
+    .replace(/_x([0-9A-F]{4})_/g, (m, x2) => String.fromCharCode(parseInt(x2, 16)));
+}
+function attr(x, name) { const m = x.match(new RegExp('(?:^|\\s)' + name + '="([^"]*)"')); return m ? decodeXml(m[1]) : null; }
+function colIndex(ref) { let n = 0; for (const ch of ref) { const c = ch.charCodeAt(0); if (c < 65 || c > 90) break; n = n * 26 + (c - 64); } return n - 1; }
+function parseSheetXml(xml, sst) {
+  const rows = []; let seq = 0;
+  const reRow = /<row\b([^>]*?)\/>|<row\b([^>]*)>([\s\S]*?)<\/row>/g, reCell = /<c\b([^>]*?)\/>|<c\b([^>]*)>([\s\S]*?)<\/c>/g; let m;
+  while ((m = reRow.exec(xml))) {
+    const a = m[1] ?? m[2] ?? ''; const rA = attr(a, 'r'); const ri = rA ? parseInt(rA, 10) - 1 : seq; seq = ri + 1;
+    if (ri >= LIMITS.rows) throw new Error('Fichier trop volumineux (plus de ' + LIMITS.rows + ' lignes).');
+    const row = []; const body = m[3] || ''; let c, cseq = 0; reCell.lastIndex = 0;
+    while ((c = reCell.exec(body))) {
+      const ca = c[1] ?? c[2] ?? '', inner = c[3] || ''; const ref = attr(ca, 'r'); const ci = ref ? colIndex(ref) : cseq; cseq = ci + 1;
+      if (ci < 0 || ci > 200) continue;
+      const t = attr(ca, 't'); const vm = inner.match(/<v>([\s\S]*?)<\/v>/); const v = vm ? vm[1] : null; let val = null;
+      if (t === 's') val = v != null ? (sst[parseInt(v, 10)] ?? '') : null;
+      else if (t === 'inlineStr') { let st = ''; for (const tm of inner.matchAll(/<t\b[^>]*>([\s\S]*?)<\/t>/g)) st += tm[1]; val = decodeXml(st); }
+      else if (t === 'str') val = v != null ? decodeXml(v) : null;
+      else if (t === 'b') val = v === '1'; else if (t === 'e') val = null;
+      else if (v != null) { const num = parseFloat(v); val = Number.isFinite(num) ? num : decodeXml(v); }
+      row[ci] = val;
+    }
+    rows[ri] = row;
+  }
+  for (let i = 0; i < rows.length; i++) if (!rows[i]) rows[i] = [];
+  return rows;
+}
+async function readXlsx(buf) {
+  const z = await openZip(buf);
+  const wbx = await z.text('xl/workbook.xml'); if (!wbx) throw new Error('Classeur Excel invalide (workbook.xml absent).');
+  const rels = (await z.text('xl/_rels/workbook.xml.rels')) || ''; const relMap = {};
+  for (const m of rels.matchAll(/<Relationship\b([^>]*?)\/?>/g)) relMap[attr(m[1], 'Id')] = attr(m[1], 'Target');
+  const sst = []; const ss = await z.text('xl/sharedStrings.xml');
+  if (ss) for (const m of ss.matchAll(/<si\b[^>]*\/>|<si\b[^>]*>([\s\S]*?)<\/si>/g)) { const inner = (m[1] || '').replace(/<rPh\b[\s\S]*?<\/rPh>/g, ''); let t = ''; for (const tm of inner.matchAll(/<t\b[^>]*>([\s\S]*?)<\/t>/g)) t += tm[1]; sst.push(decodeXml(t)); }
+  const sheets = [...wbx.matchAll(/<sheet\b([^>]*?)\/?>/g)].map(m => ({ name: attr(m[1], 'name'), rid: attr(m[1], 'r:id') }));
+  if (!sheets.length) throw new Error('Aucune feuille trouvée dans le classeur.');
+  const out = [];
+  for (const sh of sheets.slice(0, 30)) {
+    const t = relMap[sh.rid]; if (!t) continue;
+    const path = t.startsWith('/') ? t.slice(1) : 'xl/' + t.replace(/^\.\//, '');
+    const xml = await z.text(path); if (!xml) continue;
+    out.push({ name: sh.name, rows: parseSheetXml(xml, sst) });
+  }
+  return out;
+}
+function readCsv(buf) {
+  let text = new TextDecoder('utf-8').decode(buf); if (text.includes('�')) text = new TextDecoder('windows-1252').decode(buf);
+  text = text.replace(/^﻿/, ''); const nl = text.indexOf('\n'); const first = text.slice(0, nl > 0 ? nl : text.length);
+  const delim = first.split(';').length >= first.split(',').length ? ';' : ','; const rows = []; let row = [], cell = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) { if (ch === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; } else cell += ch; }
+    else if (ch === '"') q = true; else if (ch === delim) { row.push(cell); cell = ''; }
+    else if (ch === '\n' || ch === '\r') { if (ch === '\r' && text[i + 1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; if (rows.length > LIMITS.rows) throw new Error('Fichier trop volumineux.'); }
+    else cell += ch;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  return [{ name: 'CSV', rows: rows.map(r => r.map(v => v === '' ? null : v)) }];
+}
+
+/* ============================ 3. Grand livre ============================ */
+function findHeader(rows) { for (let i = 0; i < Math.min(rows.length, 60); i++) { const n = (rows[i] || []).map(norm); if (n.includes('date') && n.some(x => x.includes('debit')) && n.some(x => x.includes('credit'))) return i; } return -1; }
+function toISOfromFR(x) { const m = String(x).match(/(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4}|\d{2})(?!\d)/); if (!m) return null; let y = +m[3]; if (y < 100) y += 2000; const d = +m[1], mo = +m[2]; if (mo < 1 || mo > 12 || d < 1 || d > 31) return null; return `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`; }
+function toISO(v) { if (v == null || v === '') return null; if (typeof v === 'number') { if (v < 20000 || v > 80000) return null; return msToIso(Date.UTC(1899, 11, 30) + Math.round(v) * DAY); } const t = String(v).trim(); return /^\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}$/.test(t) ? toISOfromFR(t) : null; }
+function num(v) { if (v == null || v === '') return 0; if (typeof v === 'number') return v; const t = String(v).replace(/[\s  ]/g, '').replace(/,(?=\d{1,2}$)/, '.').replace(/,/g, ''); const n = parseFloat(t); return Number.isFinite(n) ? n : 0; }
+const str = v => v == null ? '' : String(v).trim();
+
+function parseGL(rows) {
+  const hi = findHeader(rows);
+  if (hi < 0) throw new Error("En-tête du grand livre introuvable : le fichier doit contenir les colonnes « Date », « Débit » et « Crédit ».");
+  const hn = rows[hi].map(norm); const find = f => hn.findIndex(x => x && f(x));
+  const map = { date: find(x => x === 'date'), piece: find(x => x.includes('piece')), jnl: find(x => x === 'jr' || x.startsWith('journal') || x === 'jnl' || x === 'jl'), lib: find(x => x.startsWith('libelle')),
+    ref: find(x => x.startsWith('reference') || x === 'ref'), cp: find(x => x.includes('partie')), d: find(x => x.includes('debit')), c: find(x => x.includes('credit')), lett: find(x => x.startsWith('lettr')) };
+  for (const k of ['date', 'lib', 'd', 'c']) if (map[k] < 0) throw new Error('Colonne obligatoire manquante dans le grand livre : ' + k);
+  let periodStart = null, periodEnd = null, company = '';
+  for (let i = 0; i <= hi; i++) { const j = (rows[i] || []).map(str).join(' '); const m = j.match(/p[ée]riode\s+du\s+(\d{1,2}\/\d{1,2}\/\d{4})\s+au\s+(\d{1,2}\/\d{1,2}\/\d{4})/i); if (m) { periodStart = toISOfromFR(m[1]); periodEnd = toISOfromFR(m[2]); } }
+  const accounts = new Map(), entries = [], totals = new Map(); let cur = null; const g = (r, k) => map[k] >= 0 ? r[map[k]] : null;
+  for (let i = hi + 1; i < rows.length; i++) {
+    const r = rows[i] || []; const c0 = r[0]; const iso = toISO(g(r, 'date'));
+    if (iso && cur) {
+      const lib = str(g(r, 'lib'));
+      const e = { id: entries.length, acct: cur, date: iso, piece: str(g(r, 'piece')), jnl: str(g(r, 'jnl')), lib, ref: str(g(r, 'ref')), cp: str(g(r, 'cp')).replace(/\s/g, ''), d: r2(num(g(r, 'd'))), c: r2(num(g(r, 'c'))), lettre: str(g(r, 'lett')) };
+      e.isAN = e.jnl === '00' || /^a\s*nouveau/i.test(lib);
+      if (e.d || e.c) entries.push(e); continue;
+    }
+    if (typeof c0 === 'string') {
+      const t = c0.trim(); let m;
+      if ((m = t.match(/^TOTAL\s+COMPTE\s+(\d{4,12})/i))) { totals.set(m[1], { d: r2(num(r[map.d])), c: r2(num(r[map.c])) }); continue; }
+      if (/^(MVTS|TOTAL|SOUS)/i.test(t)) continue;
+      if ((m = t.match(/^(\d{4,12})\s+(.+)$/))) { cur = m[1]; if (!accounts.has(cur)) accounts.set(cur, m[2].replace(/^[-\s]+/, '').trim()); }
+    }
+  }
+  if (!entries.length) throw new Error('Aucune écriture reconnue dans le grand livre.');
+  const ds = entries.filter(e => !e.isAN).map(e => e.date).sort();
+  periodStart = periodStart || entries.find(e => e.isAN)?.date || ds[0]; periodEnd = periodEnd || ds[ds.length - 1];
+  return { accounts, entries, totals, periodStart, periodEnd, company };
+}
+function parseClientsSheet(sheets) {
+  const meta = new Map();
+  for (const sh of sheets) {
+    for (let i = 0; i < Math.min(sh.rows.length, 15); i++) {
+      const hn = (sh.rows[i] || []).map(norm);
+      const iA = hn.findIndex(x => x.startsWith('compte')), iD = hn.findIndex(x => x.startsWith('delai'));
+      if (iA < 0 || iD < 0) continue;
+      const iE = hn.findIndex(x => x.includes('mail')), iN = hn.findIndex(x => x.startsWith('client') || x.startsWith('nom') || x.startsWith('raison')), iV = hn.findIndex(x => x.startsWith('ville')), iC = hn.findIndex(x => x.startsWith('interlocuteur') || x.startsWith('contact'));
+      for (let j = i + 1; j < sh.rows.length; j++) {
+        const r = sh.rows[j] || []; const a = str(r[iA]).replace(/\s/g, ''); if (!/^\d{4,12}$/.test(a)) continue;
+        const dl = Math.round(num(r[iD]));
+        meta.set(a, { terms: dl > 0 && dl < 1000 ? dl : null, email: iE >= 0 ? str(r[iE]).slice(0, 120) : '', name: iN >= 0 ? str(r[iN]).slice(0, 120) : '', city: iV >= 0 ? str(r[iV]).slice(0, 60) : '', contact: iC >= 0 ? str(r[iC]).slice(0, 80) : '' });
+      }
+      break;
+    }
+  }
+  return meta;
+}
+
+
+const xe = x => String(x ?? '').replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch])).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
+
+/* ============================ Moteur : cadrage de la TVA facturée ============================ */
+const DEFAULT_CFG = { regime: 'enc', periodicity: 'M', rates: '20,10', defRate: 20, tol: 1,
+  p: { clients: '342', avances: '4421', ventes: '71', export: '7113', tvaF: '4455', tvaDue: '4456', tvaRec: '3455', ras: '3458', banque: '514,516,511,554' } };
+const KNOWN = [0.20, 0.14, 0.10, 0.07];
+const lst = x => String(x).split(',').map(y => y.trim()).filter(Boolean);
+function periodLabel(iso, pr) { const y = iso.slice(2, 4), m = +iso.slice(5, 7); return pr === 'T' ? `${Math.ceil(m / 3)}T.${y}` : `${String(m).padStart(2, '0')}.${y}`; }
+function periodList(start, end, pr) {
+  const out = []; let y = +start.slice(0, 4), m = +start.slice(5, 7); if (pr === 'T') m = Math.floor((m - 1) / 3) * 3 + 1; const step = pr === 'T' ? 3 : 1;
+  for (let k = 0; k < 120; k++) { const s0 = `${y}-${String(m).padStart(2, '0')}-01`; if (s0 > end) break; const em = m + step - 1; const last = new Date(Date.UTC(y, em, 0)).getUTCDate();
+    out.push({ label: periodLabel(s0, pr), start: s0, end: `${y}-${String(em).padStart(2, '0')}-${String(last).padStart(2, '0')}`, name: pr === 'T' ? `${Math.ceil(m / 3)}e trim. ${y}` : `${MONTHS[m - 1]} ${y}` });
+    m += step; if (m > 12) { m -= 12; y++; } }
+  return out;
+}
+const pctTxt = r => (Math.round(r * 1000) / 10).toString().replace('.', ',') + ' %';
+
+function analyzeTVA(gl, cfg, inputs) {
+  const P = cfg.p, bank = lst(P.banque), R0 = cfg.defRate / 100, k0 = R0 / (1 + R0), tol = cfg.tol;
+  const legal = lst(cfg.rates).map(x => parseFloat(String(x).replace(',', '.')) / 100).filter(x => x > 0);
+  const E = gl.entries, A = gl.accounts, start = gl.periodStart, end = gl.periodEnd;
+  const isCl = a => sw(a, P.clients), isV = a => sw(a, P.ventes), isT = a => sw(a, P.tvaF);
+  const name = a => A.get(a) || a; const per = iso => periodLabel(iso, cfg.periodicity);
+  const key = e => e.jnl + '|' + e.piece + '|' + e.date;
+  const pieces = new Map(); for (const e of E) { if (e.isAN) continue; const k = key(e); if (!pieces.has(k)) pieces.set(k, []); pieces.get(k).push(e); }
+  const pieceOf = e => pieces.get(key(e)) || [e];
+
+  /* 1. Documents de vente */
+  const docs = [], docByLine = new Map(), docPieces = new Set();
+  for (const [k, L] of pieces) {
+    const vl = L.filter(e => isV(e.acct)), cl = L.filter(e => isCl(e.acct)); if (!vl.length || !cl.length) continue;
+    docPieces.add(k);
+    const ht = r2(sum(vl, e => e.c - e.d)), tl = L.filter(e => isT(e.acct)), tva = r2(sum(tl, e => e.c - e.d)), ttc = r2(sum(cl, e => e.d - e.c));
+    const f = cl[0]; const exp = vl.some(e => swAny(e.acct, lst(P.export))) || /export/i.test(f.lib);
+    const tacct = tl.length ? tl.slice().sort((a, b) => Math.abs(b.c - b.d) - Math.abs(a.c - a.d))[0].acct : '';
+    const d = { id: docs.length, date: f.date, piece: f.piece, jnl: f.jnl, ref: f.ref || vl[0].ref || f.piece, cacct: f.acct, client: name(f.acct), lib: f.lib, kind: ht >= 0 ? 'Facture' : 'Avoir',
+      ht, tva, ttc, exp, tacct, taccts: [...new Set(tl.map(e => e.acct))].join(' / '), vaccts: [...new Set(vl.map(e => e.acct))].join(' / '), rate: ht ? tva / ht : 0, per: per(f.date), flags: [], theo: 0, cat: '', rs: null };
+    if (Math.abs(tva) < 0.01) { d.rs = 0; if (exp) { d.cat = 'Export exonéré'; d.theo = 0; } else { d.cat = 'Sans TVA'; d.theo = r2(ht * R0); d.flags.push({ k: 'notva', t: `Vente locale sans TVA : TVA théorique ${fmt(d.theo)} au taux de ${cfg.defRate} %` }); } }
+    else { const ar = Math.abs(d.rate); d.rs = KNOWN.reduce((b, r) => Math.abs(r - ar) < Math.abs(b - ar) ? r : b, KNOWN[0]);
+      if (!legal.some(r => Math.abs(r - d.rs) < 1e-9)) { d.cat = `${pctTxt(d.rs)} (non applicable)`; d.theo = r2(ht * R0); d.flags.push({ k: 'rate', t: `Taux de ${pctTxt(d.rs)} non applicable : à facturer à 10 % ou 20 % selon le produit (hypothèse ${cfg.defRate} %)` }); }
+      else { d.cat = pctTxt(d.rs); d.theo = r2(ht * d.rs); } }
+    d.ecart = r2(d.tva - d.theo);
+    if (d.flags.every(x => x.k !== 'notva' && x.k !== 'rate') && Math.abs(d.ecart) > tol) d.flags.push({ k: 'calc', t: `Erreur de calcul : TVA ${fmt(d.tva)} au lieu de ${fmt(d.theo)} (écart ${fmt(d.ecart)})` });
+    if (Math.abs(d.ttc - (d.ht + d.tva)) > tol) d.flags.push({ k: 'ttc', t: `TTC client (${fmt(d.ttc)}) ≠ HT + TVA (${fmt(d.ht + d.tva)})` });
+    if (exp && Math.abs(tva) >= 0.01) d.flags.push({ k: 'exp', t: 'Vente à l\'export avec TVA : vérifier l\'exonération (art. 92 CGI)' });
+    docs.push(d); for (const c of cl) docByLine.set(c.id, d);
+  }
+  // Taux dominant de chaque compte de TVA facturée
+  const accRate = new Map(); { const w = new Map(); for (const d of docs) { if (!d.tacct || !d.rs || !legal.some(r => Math.abs(r - d.rs) < 1e-9)) continue; const m = w.get(d.tacct) || new Map(); m.set(d.rs, (m.get(d.rs) || 0) + Math.abs(d.ht)); w.set(d.tacct, m); }
+    for (const [a, m] of w) accRate.set(a, [...m].sort((x, y) => y[1] - x[1])[0][0]); }
+  const accForRate = r => [...accRate].find(([, v]) => Math.abs(v - r) < 1e-9)?.[0] || '';
+  for (const d of docs) { const ar = accRate.get(d.tacct); if (d.tacct && ar != null && d.rs && legal.some(r => Math.abs(r - d.rs) < 1e-9) && Math.abs(ar - d.rs) > 1e-9) { d.wrongAcct = true; d.goodAcct = accForRate(d.rs); d.flags.push({ k: 'acct', t: `TVA à ${pctTxt(d.rs)} comptabilisée dans ${d.tacct} (compte du taux ${pctTxt(ar)})${d.goodAcct ? ' : reclasser en ' + d.goodAcct : ''}` }); } }
+
+  /* 2. Ventilation par taux */
+  const cats = new Map();
+  for (const d of docs) { const c = cats.get(d.cat) || { cat: d.cat, rs: d.rs, n: 0, ht: 0, tva: 0, theo: 0 }; c.n++; c.ht += d.ht; c.tva += d.tva; c.theo += d.theo; cats.set(d.cat, c); }
+  const rates = [...cats.values()].map(c => ({ ...c, ht: r2(c.ht), tva: r2(c.tva), theo: r2(c.theo), ecart: r2(c.tva - c.theo), eff: c.ht ? c.tva / c.ht : 0 })).sort((a, b) => b.ht - a.ht);
+  const tvaAccts = [...new Set(E.filter(e => isT(e.acct)).map(e => e.acct))].sort().map(a => {
+    const L = E.filter(e => e.acct === a); const fromDocs = r2(sum(L.filter(e => docPieces.has(key(e))), e => e.c - e.d));
+    const theo = r2(sum(docs.filter(d => d.tacct === a), d => d.theo));
+    return { acct: a, name: name(a), rate: accRate.get(a), an: r2(sum(L.filter(e => e.isAN), e => e.c - e.d)), fact: fromDocs, other: r2(sum(L.filter(e => !e.isAN && !docPieces.has(key(e)) && e.c > 0), e => e.c)), decl: r2(sum(L.filter(e => !e.isAN && !docPieces.has(key(e)) && e.d > 0), e => e.d)), solde: r2(sum(L, e => e.c - e.d)), theo };
+  });
+  const caGL = r2(sum(E.filter(e => isV(e.acct) && !e.isAN), e => e.c - e.d));
+  const caDocs = r2(sum(docs, d => d.ht));
+  const otherCA = E.filter(e => isV(e.acct) && !e.isAN && !docPieces.has(key(e)));
+  const tvaDocs = r2(sum(docs, d => d.tva)), tvaTheo = r2(sum(docs, d => d.theo));
+
+  /* 3. Encaissements et exigibilité */
+  const cl = new Map(); for (const e of E) if (isCl(e.acct)) { if (!cl.has(e.acct)) cl.set(e.acct, []); cl.get(e.acct).push(e); }
+  const ratioOf = e => { const d = docByLine.get(e.id); if (d) return d.ttc ? d.tva / d.ttc : 0; if (e.isAN) return k0; return null; };
+  const enc = [], openTva = [];
+  for (const [acct, L] of cl) {
+    const myDocs = docs.filter(d => d.cacct === acct); const anL = L.filter(e => e.isAN && e.d > 0);
+    const avgR = (sum(myDocs, d => d.tva) + sum(anL, e => e.d * k0)) / ((sum(myDocs, d => d.ttc) + sum(anL, e => e.d)) || 1);
+    const groups = new Map(), unl = [];
+    for (const e of L) { if (e.lettre) { if (!groups.has(e.lettre)) groups.set(e.lettre, []); groups.get(e.lettre).push(e); } else unl.push(e); }
+    const isPay = e => e.c > 0 && !e.isAN && !docByLine.has(e.id);
+    const rasIn = e => r2(sum(pieceOf(e).filter(x => sw(x.acct, P.ras) && x.d > 0), x => x.d));
+    const pushEnc = (e, r, refs, lettered) => enc.push({ date: e.date, per: per(e.date), acct, client: name(acct), refs, amount: r2(e.c - e.d), ratio: r, tva: r2((e.c - e.d) * r), lettre: lettered ? e.lettre : '', est: !lettered, ras: rasIn(e), lib: e.lib });
+    const openDeb = [], openCred = [];
+    for (const [, G] of groups) {
+      const invs = G.filter(e => e.d > 0 && ratioOf(e) != null), avs = G.filter(e => e.c > 0 && docByLine.has(e.id));
+      const ttcG = sum(invs, e => e.d) - sum(avs, e => e.c); const tvaG = sum(invs, e => e.d * ratioOf(e)) - sum(avs, e => e.c * ratioOf(e));
+      const rG = ttcG > 0 ? tvaG / ttcG : avgR; const refs = [...new Set(invs.map(e => e.ref).filter(Boolean))].join(' + ');
+      for (const p of G.filter(isPay)) pushEnc(p, rG, refs, true);
+      const net = r2(sum(G, e => e.d - e.c)); if (Math.abs(net) < 0.01) continue;
+      if (net > 0) openDeb.push({ e: invs[0] || G[0], amt: net, r: rG }); else openCred.push({ amt: -net });
+    }
+    for (const e of unl) {
+      if (isPay(e)) { pushEnc(e, avgR, '(non lettré)', false); openCred.push({ amt: r2(e.c - e.d) }); }
+      else if (e.d > 0) openDeb.push({ e, amt: r2(e.d - e.c), r: ratioOf(e) ?? avgR });
+      else if (e.c > 0) openCred.push({ amt: r2(e.c - e.d) });
+    }
+    openDeb.sort((a, b) => a.e.date.localeCompare(b.e.date)); let pool = r2(sum(openCred, c => c.amt));
+    for (const o of openDeb) { let rem = o.amt; const used = Math.min(pool, rem); rem = r2(rem - used); pool = r2(pool - used); if (rem > 0.004) openTva.push({ acct, client: name(acct), ref: o.e.ref || o.e.piece, date: o.e.date, ttc: rem, ratio: o.r, tva: r2(rem * o.r), an: o.e.isAN }); }
+    if (pool > 0.01) openTva.push({ acct, client: name(acct), ref: 'Règlements non affectés', date: '', ttc: -pool, ratio: avgR, tva: r2(-pool * avgR), an: false });
+  }
+  enc.sort((a, b) => a.date.localeCompare(b.date));
+  // Avances clients
+  const adv = E.filter(e => sw(e.acct, P.avances) && e.c > 0 && !e.isAN && pieceOf(e).some(x => swAny(x.acct, bank))).map(e => {
+    const tb = r2(sum(pieceOf(e).filter(x => isT(x.acct)), x => x.c - x.d)); const ttc = r2(e.c + tb); const theo = r2(ttc * k0);
+    return { date: e.date, per: per(e.date), lib: e.lib, ref: e.ref, amount: e.c, tvaBooked: tb, theo, missing: r2(theo - tb) };
+  });
+  // Écritures déclaratives (débits 4455 hors pièces de vente)
+  const declLines = E.filter(e => isT(e.acct) && !e.isAN && !docPieces.has(key(e)) && e.d > 0);
+  const decPieceKeys = new Set(declLines.map(key));
+  const otherTvaCred = E.filter(e => isT(e.acct) && !e.isAN && !docPieces.has(key(e)) && e.c > 0 && !adv.some(a => a.date === e.date && pieceOf(e).some(x => sw(x.acct, P.avances))));
+  const rasLines = E.filter(e => sw(e.acct, P.ras) && e.d > 0 && !e.isAN && pieceOf(e).some(x => isCl(x.acct)));
+  const rasImpLines = E.filter(e => sw(e.acct, P.ras) && e.c > 0 && !e.isAN);
+
+  /* 4. Cadrage des déclarations */
+  const pers = periodList(start, end, cfg.periodicity); let cum = 0, cumGL = 0;
+  const decl = pers.map(p => {
+    const inP = d => d >= p.start && d <= p.end;
+    const fact = r2(sum(docs.filter(d => inP(d.date)), d => d.tva));
+    const exigEnc = r2(sum(enc.filter(x => inP(x.date)), x => x.tva));
+    const exigDeb = fact;
+    const advT = r2(sum(adv.filter(a => inP(a.date)), a => a.tvaBooked));
+    const exig = r2((cfg.regime === 'deb' ? exigDeb : exigEnc) + advT);
+    const declGL = r2(sum(declLines.filter(e => inP(e.date)), e => e.d));
+    const has = inputs && Object.prototype.hasOwnProperty.call(inputs, p.label);
+    const declared = has ? r2(inputs[p.label]) : declGL;
+    const pk = [...decPieceKeys].filter(k => inP(k.split('|')[2]));
+    const pl = pk.flatMap(k => pieces.get(k) || []);
+    const ded = r2(sum(pl.filter(e => sw(e.acct, P.tvaRec) && e.c > 0), e => e.c));
+    const rasImp = r2(sum(rasImpLines.filter(e => inP(e.date)), e => e.c));
+    const rasSub = r2(sum(rasLines.filter(e => inP(e.date)), e => e.d));
+    const net = r2(sum(pl.filter(e => sw(e.acct, P.tvaDue)), e => e.c - e.d));
+    const ecart = r2(exig - declared); cum = r2(cum + ecart); cumGL = r2(cumGL + exig - declGL);
+    return { ...p, fact, exigEnc, exigDeb, advT, exig, declGL, declared, edited: has && Math.abs(inputs[p.label] - declGL) > 0.004, ecart, cum, ded, rasSub, rasImp, rasEcart: r2(rasSub - rasImp), net, netTheo: r2(declared - ded - rasImp), advMissing: r2(sum(adv.filter(a => inP(a.date)), a => a.missing)) };
+  });
+
+  /* 5. Solde du compte de TVA facturée */
+  const solde = r2(-sum(E.filter(e => isT(e.acct)), e => e.d - e.c));
+  const anT = r2(-sum(E.filter(e => isT(e.acct) && e.isAN), e => e.d - e.c));
+  const latent = r2(sum(openTva, o => o.tva));
+  const advBookedTot = r2(sum(adv, a => a.tvaBooked));
+  const soldeRec = { an: anT, fact: tvaDocs, advT: advBookedTot, other: r2(sum(otherTvaCred, e => e.c)), decl: r2(sum(declLines, e => e.d)), solde, latent, nonDecl: r2(solde - latent), cumGL };
+  soldeRec.calc = r2(soldeRec.an + soldeRec.fact + soldeRec.advT + soldeRec.other - soldeRec.decl);
+  soldeRec.cross = r2(soldeRec.nonDecl - cumGL);
+  const rasBal = r2(sum(E.filter(e => sw(e.acct, P.ras)), e => e.d - e.c));
+
+  /* 6. Anomalies et écritures proposées */
+  const anos = [], ecr = []; const acc20 = accForRate(R0) || (P.tvaF + '00000').slice(0, 9);
+  const F = k => docs.filter(d => d.flags.some(x => x.k === k));
+  const add = (sev, theme, montant, constat, ref, impact, reco) => anos.push({ sev, theme, montant, constat, ref, impact, reco });
+  const notva = F('notva'); if (notva.length) { const m = r2(sum(notva, d => d.theo)); add('high', 'Ventes locales sans TVA', m, notva.map(d => `${d.ref} (${d.client}, HT ${fmt(d.ht)})`).join(' ; ') + '.', 'Art. 89, 96 et 98 CGI', 'TVA non collectée et non déclarée : rappel de TVA avec pénalités et majorations, sauf exonération justifiée.', 'Vérifier le régime de l\'opération. À défaut d\'exonération justifiée, émettre une facture rectificative et régulariser la TVA.');
+    notva.forEach(d => ecr.push({ ref: 'E1', lines: [{ acct: d.cacct, lib: d.client, d: d.theo, c: 0 }, { acct: acc20, lib: name(acc20) || 'TVA facturée', d: 0, c: d.theo }], just: `TVA omise sur ${d.ref} (facture rectificative)` })); }
+  const badr = F('rate'); if (badr.length) { const m = r2(sum(badr, d => d.theo - d.tva)); add('high', 'Taux de TVA non applicables', m, badr.map(d => `${d.ref} (${d.client}) à ${pctTxt(d.rs)}`).join(' ; ') + '.', 'Art. 98 et 99 CGI (taux 20 % et 10 %)', 'TVA facturée insuffisante si le bon taux est 20 %, ou facture erronée si le produit relève de 10 %.', 'Déterminer le taux applicable au produit et émettre une facture rectificative ; régulariser le complément de TVA.');
+    badr.forEach(d => ecr.push({ ref: 'E2', lines: [{ acct: d.cacct, lib: d.client, d: r2(d.theo - d.tva), c: 0 }, { acct: d.tacct || acc20, lib: name(d.tacct) || 'TVA facturée', d: 0, c: r2(d.theo - d.tva) }], just: `Complément de TVA sur ${d.ref} (hypothèse ${cfg.defRate} %)` })); }
+  const calc = F('calc'); if (calc.length) { const m = r2(sum(calc, d => d.ecart)); add('mid', 'Erreurs de calcul de TVA', m, calc.map(d => `${d.ref} : ${fmt(d.tva)} au lieu de ${fmt(d.theo)}`).join(' ; ') + '.', 'Art. 96 CGI (base imposable)', 'TVA facturée différente de la TVA due sur la base HT.', 'Corriger la facture (avoir et refacturation) et régulariser la TVA collectée.');
+    calc.forEach(d => { const v = Math.abs(d.ecart); ecr.push({ ref: 'E3', lines: d.ecart < 0 ? [{ acct: d.cacct, lib: d.client, d: v, c: 0 }, { acct: d.tacct, lib: name(d.tacct), d: 0, c: v }] : [{ acct: d.tacct, lib: name(d.tacct), d: v, c: 0 }, { acct: d.cacct, lib: d.client, d: 0, c: v }], just: `Correction de TVA sur ${d.ref}` }); }); }
+  const wa = docs.filter(d => d.wrongAcct); if (wa.length) { const m = r2(sum(wa, d => d.tva)); add('mid', 'TVA comptabilisée dans le mauvais compte de taux', m, wa.map(d => `${d.ref} : TVA à ${pctTxt(d.rs)} en ${d.tacct}`).join(' ; ') + '.', 'Ventilation de la déclaration par taux', 'Ventilation fausse du chiffre d\'affaires et de la TVA par taux dans les déclarations.', 'Reclasser la TVA vers le compte du bon taux et vérifier la ventilation déclarée.');
+    wa.forEach(d => ecr.push({ ref: 'E4', lines: [{ acct: d.tacct, lib: name(d.tacct), d: d.tva, c: 0 }, { acct: d.goodAcct || (P.tvaF + ' (taux ' + pctTxt(d.rs) + ')'), lib: name(d.goodAcct) || 'TVA facturée', d: 0, c: d.tva }], just: `Reclassement de la TVA de ${d.ref}` })); }
+  const advM = adv.filter(a => a.missing > tol); if (advM.length) { const m = r2(sum(advM, a => a.missing)); add('high', 'Avances clients encaissées sans TVA', m, advM.map(a => `${fmtD(a.date)} – ${a.lib} : ${fmt(a.amount)}`).join(' ; ') + '.', 'Art. 95 CGI (encaissement, y compris des acomptes)', 'En régime de l\'encaissement, la TVA est exigible dès l\'encaissement des avances : TVA non déclarée.', 'Isoler la TVA incluse dans l\'avance et la déclarer au titre du mois d\'encaissement (déclaration rectificative si nécessaire).');
+    advM.forEach(a => ecr.push({ ref: 'E5', lines: [{ acct: (P.avances + '00000').slice(0, 9), lib: 'Clients – avances et acomptes reçus', d: a.missing, c: 0 }, { acct: acc20, lib: name(acc20) || 'TVA facturée', d: 0, c: a.missing }], just: `TVA incluse dans l'avance du ${fmtD(a.date)}` })); }
+  const bad = decl.filter(p => Math.abs(p.ecart) > tol); if (bad.length) { const m = r2(sum(bad, p => p.ecart)); add('high', 'Écarts entre TVA exigible et TVA déclarée', m, bad.map(p => `${p.name} : exigible ${fmt(p.exig)} / déclarée ${fmt(p.declared)} (${p.ecart > 0 ? 'sous' : 'sur'}-déclaration ${fmt(Math.abs(p.ecart))})`).join(' ; ') + '.', 'Art. 110, 111 et 112 CGI', 'Sous-déclaration : rappel de TVA avec pénalités et majorations de retard. Sur-déclaration : TVA payée en trop, à régulariser.', 'Identifier les encaissements concernés (onglet Exigibilité), déposer une déclaration rectificative ou régulariser sur la déclaration suivante.'); }
+  const rasK = decl.filter(p => p.rasEcart > tol); if (rasK.length || rasBal > tol) { const m = r2(Math.max(rasBal, sum(rasK, p => p.rasEcart))); add('mid', 'Retenue à la source TVA non imputée', m, (rasK.map(p => `${p.name} : retenue subie ${fmt(p.rasSub)}, imputée ${fmt(p.rasImp)}`).join(' ; ') || 'Solde débiteur du compte de TVA retenue à la source') + `. Solde ${P.ras} : ${fmt(rasBal)}.`, 'Art. 117 CGI', 'TVA versée deux fois : par le client (retenue) et par vous (déclaration) ; trésorerie immobilisée.', 'Imputer la retenue sur la prochaine déclaration (attestation de retenue du client à l\'appui).');
+    if (rasBal > tol) ecr.push({ ref: 'E6', lines: [{ acct: (P.tvaDue + '00000').slice(0, 9), lib: 'État – TVA due', d: rasBal, c: 0 }, { acct: (P.ras + '00000').slice(0, 9), lib: 'État – TVA retenue à la source', d: 0, c: rasBal }], just: 'Imputation de la retenue à la source sur la prochaine déclaration' }); }
+  const ttcK = F('ttc'); if (ttcK.length) add('mid', 'Incohérences TTC / HT + TVA', r2(sum(ttcK, d => d.ttc - d.ht - d.tva)), ttcK.map(d => d.ref).join(', '), '—', 'Créance client différente de la facture.', 'Contrôler les saisies.');
+  if (otherTvaCred.length) add('low', 'TVA facturée hors factures de vente', r2(sum(otherTvaCred, e => e.c)), otherTvaCred.map(e => `${fmtD(e.date)} ${e.lib}`).join(' ; '), '—', 'TVA sans facture de vente identifiée.', 'Justifier ces écritures (OD, régularisations).');
+  if (otherCA.length) add('low', 'Produits hors facturation client', r2(sum(otherCA, e => e.c - e.d)), `${otherCA.length} écriture(s) de chiffre d'affaires sans compte client dans la pièce (OD, FAE…).`, '—', 'CA éventuellement non soumis à TVA ou soumis plus tard.', 'Vérifier le traitement TVA de ces produits.');
+  const est = enc.filter(x => x.est); if (est.length) add('low', 'Encaissements non lettrés', r2(sum(est, x => x.tva)), `${est.length} encaissement(s) non lettré(s) : TVA exigible estimée au taux moyen du client.`, 'Art. 95 CGI', 'Exigibilité approximative.', 'Lettrer les règlements avec les factures.');
+  const order = { high: 0, mid: 1, low: 2, ok: 3 }; anos.sort((a, b) => order[a.sev] - order[b.sev] || Math.abs(b.montant) - Math.abs(a.montant));
+  const okc = [];
+  if (Math.abs(soldeRec.calc - solde) < 0.05) okc.push('Solde du compte 4455 reconstitué à partir des mouvements.');
+  if (Math.abs(soldeRec.cross) < tol) okc.push('Cadrage croisé : TVA non encore exigible + écarts déclaratifs = solde 4455.');
+  if (!docs.some(d => d.flags.some(f => f.k === 'ttc'))) okc.push('Toutes les créances TTC égales à HT + TVA.');
+  if (okc.length) add('ok', 'Contrôles concluants', null, okc.join(' '), '—', 'Aucun écart.', 'Conserver le lettrage systématique des encaissements.');
+
+  return { cfg, gl, docs, rates, tvaAccts, caGL, caDocs, otherCA, tvaDocs, tvaTheo, enc, adv, decl, openTva, solde, soldeRec, rasBal, rasLines, anos, ecr,
+    totals: { exig: r2(sum(decl, p => p.exig)), declared: r2(sum(decl, p => p.declared)), ecart: r2(sum(decl, p => p.ecart)), enc: r2(sum(enc, x => x.amount)), rasSub: r2(sum(decl, p => p.rasSub)), rasImp: r2(sum(decl, p => p.rasImp)) },
+    nAnoDocs: docs.filter(d => d.flags.length).length };
+}
+
+/* ============================ Rendu ============================ */
+let STATE = { gl: null, R: null, file: null, cfg: JSON.parse(JSON.stringify(DEFAULT_CFG)), inputs: {}, company: '' };
+const TABS = [{ id: 'dash', label: 'Synthèse' }, { id: 'docs', label: 'Factures de vente' }, { id: 'rates', label: 'Ventilation par taux' }, { id: 'enc', label: 'Exigibilité' }, { id: 'decl', label: 'Déclarations ✏️' }, { id: 'solde', label: 'Solde 4455' }, { id: 'ras', label: 'Retenue à la source' }, { id: 'anos', label: 'Anomalies & écritures' }, { id: 'params', label: 'Paramètres' }];
+let activeTab = 'dash';
+const badge = (t, k) => h('span', { class: 'badge b-' + k }, t);
+const PAL = { lav: ['var(--lav)', 'var(--lav-d)'], mint: ['var(--mint)', 'var(--mint-d)'], peach: ['var(--peach)', 'var(--peach-d)'], rose: ['var(--rose)', 'var(--rose-d)'], sky: ['var(--sky)', 'var(--sky-d)'], lemon: ['var(--lemon)', 'var(--lemon-d)'] };
+const IC = { doc: 'M14 3H6v18h12V7zM14 3v4h4M9 13h6M9 17h6', coin: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9 10h4a2 2 0 0 1 0 4H9V8m2-2v2m0 8v2', check: 'M20 6 9 17l-5-5', alert: 'M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z', scale: 'M12 3v18M5 7h14M5 7l-3 7a4 4 0 0 0 6 0zM19 7l-3 7a4 4 0 0 0 6 0z', bank: 'M3 10h18L12 4zM5 10v8M9 10v8M15 10v8M19 10v8M3 21h18', pen: 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z', layers: 'M12 2 2 7l10 5 10-5zM2 17l10 5 10-5M2 12l10 5 10-5' };
+const icon = (k, sz = 18) => s('svg', { width: sz, height: sz, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': 2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'aria-hidden': 'true' }, s('path', { d: IC[k] }));
+function kpi(label, value, unit, sub, pal, ic, cls) { const el = h('div', { class: 'card kpi ' + (cls || '') }, h('div', { class: 'top' }, h('span', { class: 'ic' }, icon(ic)), h('span', { class: 'l' }, label)), h('div', { class: 'v' }, value, unit ? h('small', null, unit) : null), sub ? h('div', { class: 's' }, sub) : null); const p = PAL[pal || 'lav']; el.style.setProperty('--pc', p[0]); el.style.setProperty('--pd', p[1]); return el; }
+function panelHead(title, desc, ...right) { return h('div', { class: 'panel-head' }, h('div', null, h('h2', null, title), desc ? h('p', null, desc) : null), h('div', { class: 'spacer' }), ...right); }
+const okBadge = (v, tol = 1) => badge(Math.abs(v) <= tol ? '✓ ' + fmt(v) : fmt(v), Math.abs(v) <= tol ? 'ok' : 'ko');
+function table(cols, rows, opts = {}) {
+  const wrap = h('div', { class: 'tablewrap' }); const tbl = h('table'); wrap.append(tbl);
+  let sortKey = opts.sortKey || null, sortDir = opts.sortDir || 1; const trh = h('tr');
+  cols.forEach(c => { const th = h('th', { class: [(c.num ? 'num' : ''), (c.nosort ? 'nosort' : ''), (c.bk ? 'bk' : '')].join(' ').trim() || null, scope: 'col', tabindex: c.nosort ? null : '0', title: c.title || null }, c.label);
+    if (c.bk) th.style.background = c.bk;
+    if (!c.nosort) { const go = () => { sortDir = sortKey === c.key ? -sortDir : (c.num ? -1 : 1); sortKey = c.key; [...trh.children].forEach(x => x.removeAttribute('aria-sort')); th.setAttribute('aria-sort', sortDir > 0 ? 'ascending' : 'descending'); draw(); };
+      th.addEventListener('click', go); th.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); go(); } }); }
+    trh.append(th); });
+  tbl.append(h('thead', null, trh)); const tbody = h('tbody'); tbl.append(tbody); let current = rows;
+  function draw() {
+    clear(tbody); let data = current.slice();
+    if (sortKey) { const c = cols.find(x => x.key === sortKey); const v = r => c.sortVal ? c.sortVal(r) : r[c.key]; data.sort((a, b) => { const x = v(a), y = v(b); return (typeof x === 'number' && typeof y === 'number' ? x - y : String(x ?? '').localeCompare(String(y ?? ''), 'fr', { numeric: true })) * sortDir; }); }
+    const frag = document.createDocumentFragment();
+    for (const r of data) {
+      const tr = h('tr', { class: opts.rowClass ? opts.rowClass(r) : null });
+      for (const c of cols) { const v = c.render ? c.render(r) : c.num ? fmt(r[c.key]) : c.date ? fmtD(r[c.key]) : (r[c.key] ?? ''); const td = h('td', { class: [c.num ? 'num' : '', c.wrap ? 'wrap' : '', c.mono ? 'mono' : '', c.nowrap ? 'nowrap' : '', c.heat ? 'heat' : ''].join(' ').trim() || null }, v);
+        if (c.heat) c.heat(td, r); tr.append(td); }
+      if (opts.onRow) opts.onRow(tr, r, tbody);
+      frag.append(tr);
+    }
+    if (opts.totals && data.length) { const tr = h('tr', { class: 'tot' }); cols.forEach((c, i) => tr.append(h('td', { class: c.num ? 'num' : null }, i === 0 ? `Total (${data.length})` : c.sum ? fmt(r2(sum(data, x => x[c.key] || 0))) : ''))); frag.append(tr); }
+    if (!data.length) frag.append(h('tr', null, h('td', { colspan: cols.length }, 'Aucune ligne ne correspond aux filtres.')));
+    tbody.append(frag);
+  }
+  draw(); wrap.update = rs => { current = rs; draw(); }; return wrap;
+}
+function searchBox(ph) { const i = h('input', { type: 'search', placeholder: ph, 'aria-label': ph }); const ic = s('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': 2 }, s('circle', { cx: 11, cy: 11, r: 7 }), s('path', { d: 'm20 20-3.5-3.5' })); return { el: h('div', { class: 'search' }, ic, i), input: i }; }
+
+
+
+function barChart(R) {
+  const S = R.decl; const W = 780, H = 280, pl = 58, pr = 16, pt = 18, pb = 34; const iw = W - pl - pr, ih = H - pt - pb;
+  const maxV = Math.max(1, ...S.map(p => Math.max(p.fact, p.exig, p.declared))) * 1.12; const minE = Math.min(0, ...S.map(p => p.ecart));
+  const g = s('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'TVA facturée, exigible et déclarée par période' });
+  for (let i = 0; i <= 4; i++) { const y = pt + ih - ih * i / 4; g.append(s('line', { x1: pl, x2: W - pr, y1: y, y2: y, class: 'grid' })); g.append(s('text', { x: pl - 8, y: y + 4, 'text-anchor': 'end' }, fmtK(maxV * i / 4))); }
+  const n = S.length, bw = iw / Math.max(1, n); const cols = ['var(--c-fact)', 'var(--c-exig)', 'var(--c-decl)'];
+  S.forEach((p, i) => { const x0 = pl + i * bw; const w = Math.min(16, bw / 4.2);
+    [p.fact, p.exig, p.declared].forEach((v, j) => { const hh = Math.max(0, v) / maxV * ih; g.append(s('rect', { x: x0 + bw / 2 - 1.5 * w - 2 + j * (w + 2), y: pt + ih - hh, width: w, height: hh, rx: 5, fill: cols[j] }, s('title', null, `${p.name} – ${['TVA facturée', 'TVA exigible', 'TVA déclarée'][j]} : ${fmt(v)}`))); });
+    if (Math.abs(p.ecart) > R.cfg.tol) { g.append(s('circle', { cx: x0 + bw / 2, cy: pt + 8, r: 9, fill: 'var(--c-ecart)' }, s('title', null, `Écart ${p.name} : ${fmt(p.ecart)}`))); g.append(s('text', { x: x0 + bw / 2, y: pt + 12, 'text-anchor': 'middle', fill: '#fff', 'font-weight': 800 }, '!')); }
+    g.append(s('text', { x: x0 + bw / 2, y: H - 12, 'text-anchor': 'middle' }, p.label)); });
+  return g;
+}
+function donut(R) {
+  const C = R.rates.filter(c => c.ht > 0); const tot = sum(C, c => c.ht); const W = 190, cx = 95, cy = 95, ro = 86, ri = 56; const cols = ['#b9a7f5', '#8fd8b8', '#ffc29a', '#f6a8c6', '#9fd0f2', '#f5dc7a'];
+  const g = s('svg', { viewBox: `0 0 ${W} ${W}`, role: 'img', 'aria-label': 'Chiffre d\'affaires HT par taux' }); let a0 = -Math.PI / 2;
+  C.forEach((c, i) => { c.col = cols[i % cols.length]; const a1 = a0 + c.ht / tot * Math.PI * 2 - 0.01; const L = a1 - a0 > Math.PI ? 1 : 0; const p = (r, a) => `${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`;
+    g.append(s('path', { d: `M${p(ro, a0)} A${ro},${ro} 0 ${L} 1 ${p(ro, a1)} L${p(ri, a1)} A${ri},${ri} 0 ${L} 0 ${p(ri, a0)} Z`, fill: c.col }, s('title', null, `${c.cat} : ${fmt(c.ht)} HT`))); a0 = a1 + 0.01; });
+  g.append(s('text', { x: cx, y: cy - 4, 'text-anchor': 'middle', class: 'strong', 'font-size': 18 }, fmtK(tot))); g.append(s('text', { x: cx, y: cy + 14, 'text-anchor': 'middle' }, 'CA HT facturé'));
+  return { g, C };
+}
+
+function renderDash(R) {
+  const p = clear($('#p-dash')); const T = R.totals, S = R.soldeRec;
+  p.append(panelHead('Synthèse de la TVA facturée', `Période du ${fmtD(R.gl.periodStart)} au ${fmtD(R.gl.periodEnd)} · régime ${R.cfg.regime === 'deb' ? 'des débits' : 'de l\'encaissement'} · déclarations ${R.cfg.periodicity === 'T' ? 'trimestrielles' : 'mensuelles'}.`));
+  p.append(h('div', { class: 'kpis' },
+    kpi('CA HT facturé', fmtK(R.caDocs), 'MAD', `${R.docs.length} factures et avoirs · CA comptable ${fmtK(R.caGL)}`, 'lav', 'doc'),
+    kpi('TVA facturée', fmtK(R.tvaDocs), 'MAD', `Théorique ${fmt(R.tvaTheo)} · écart ${fmt(R.tvaDocs - R.tvaTheo)}`, 'sky', 'coin', Math.abs(R.tvaDocs - R.tvaTheo) > R.cfg.tol ? 'ko' : 'ok'),
+    kpi('TVA exigible', fmtK(T.exig), 'MAD', R.cfg.regime === 'deb' ? 'À la facturation (régime des débits)' : `Sur ${fmtK(T.enc)} MAD encaissés`, 'mint', 'bank'),
+    kpi('Écart exigible – déclaré', fmt(T.ecart), 'MAD', `${R.decl.filter(x => Math.abs(x.ecart) > R.cfg.tol).length} période(s) en écart · déclaré ${fmtK(T.declared)}`, 'rose', 'scale', Math.abs(T.ecart) > R.cfg.tol ? 'ko' : 'ok'),
+    kpi('Solde 4455', fmtK(R.solde), 'MAD', `TVA non encore exigible ${fmtK(S.latent)}`, 'peach', 'layers'),
+    kpi('TVA non déclarée (cumul)', fmt(S.nonDecl), 'MAD', 'Solde 4455 – TVA sur créances ouvertes', 'lemon', 'alert', Math.abs(S.nonDecl) > R.cfg.tol ? 'ko' : 'ok'),
+    kpi('Retenue à la source', fmtK(T.rasSub), 'MAD', `Imputée ${fmtK(T.rasImp)} · solde ${fmt(R.rasBal)}`, 'sky', 'bank', R.rasBal > R.cfg.tol ? 'ko' : ''),
+    kpi('Anomalies', String(R.anos.filter(a => a.sev !== 'ok').length), '', `${R.nAnoDocs} facture(s) concernée(s) · ${R.ecr.length} écriture(s) proposée(s)`, 'rose', 'alert')));
+  const flow = h('div', { class: 'flow' },
+    h('div', { class: 'st' }, h('small', null, 'À-nouveau 4455'), h('b', null, fmt(S.an))), h('div', { class: 'op' }, '+'),
+    h('div', { class: 'st' }, h('small', null, 'TVA facturée + avances'), h('b', null, fmt(S.fact + S.advT + S.other))), h('div', { class: 'op' }, '−'),
+    h('div', { class: 'st' }, h('small', null, 'TVA déclarée'), h('b', null, fmt(S.decl))));
+  const flow2 = h('div', { class: 'flow' },
+    h('div', { class: 'st eq' }, h('small', null, 'Solde 4455'), h('b', null, fmt(R.solde))), h('div', { class: 'op' }, '='),
+    h('div', { class: 'st' }, h('small', null, 'TVA sur créances non encaissées'), h('b', null, fmt(S.latent))), h('div', { class: 'op' }, '+'),
+    h('div', { class: 'st' }, h('small', null, 'TVA exigible non déclarée'), h('b', null, fmt(S.nonDecl))));
+  const { g, C } = donut(R);
+  const lg = h('div', { class: 'legend' }); [['var(--c-fact)', 'TVA facturée'], ['var(--c-exig)', 'TVA exigible'], ['var(--c-decl)', 'TVA déclarée'], ['var(--c-ecart)', 'Écart à analyser']].forEach(([c, l]) => { const sp = h('span', null, h('i'), l); sp.firstChild.style.setProperty('--c', c); lg.append(sp); });
+  p.append(h('div', { class: 'grid3' },
+    h('div', { class: 'card sec' }, h('h3', null, 'TVA facturée, exigible et déclarée par période'), h('p', { class: 'sub' }, 'Les pastilles roses signalent une période à rapprocher.'), h('div', { class: 'chart' }, barChart(R)), lg),
+    h('div', { class: 'card sec' }, h('h3', null, 'Chiffre d\'affaires par taux'), h('p', { class: 'sub' }, 'Base HT des factures et avoirs'), h('div', { class: 'donut-wrap' }, h('div', { class: 'chart' }, g),
+      h('ul', { class: 'blist' }, C.map(c => { const li = h('li', null, h('i'), h('span', null, c.cat), h('span', { class: 'am' }, fmtK(c.ht))); li.firstChild.style.setProperty('--c', c.col); return li; }))))));
+  const chk = (ok, t, sub, v, warn) => h('li', null, h('span', { class: 'dot ' + (ok ? 'd-ok' : warn ? 'd-warn' : 'd-ko') }, ok ? '✓' : '!'), h('div', { class: 't' }, t, h('small', null, sub)), h('span', { class: 'amt' }, fmt(v)));
+  p.append(h('div', { class: 'grid2' },
+    h('div', { class: 'card sec' }, h('h3', null, 'Cadrage du compte 4455'), h('p', { class: 'sub' }, 'Reconstitution du solde puis analyse de sa composition'), flow, h('div', { class: 'sub' }), flow2),
+    h('div', { class: 'card sec' }, h('h3', null, 'Contrôles'), h('ul', { class: 'checks' },
+      chk(Math.abs(R.caGL - R.caDocs) <= R.cfg.tol, 'CA comptable ↔ CA facturé', 'Comptes 71 vs factures clients', R.caGL - R.caDocs, true),
+      chk(Math.abs(R.tvaDocs - R.tvaTheo) <= R.cfg.tol, 'TVA facturée ↔ HT × taux légal', 'Taux, omissions, erreurs de calcul', R.tvaDocs - R.tvaTheo),
+      chk(Math.abs(R.totals.ecart) <= R.cfg.tol, 'TVA exigible ↔ TVA déclarée', 'Somme des périodes', R.totals.ecart),
+      chk(Math.abs(S.cross) <= R.cfg.tol, 'Cadrage croisé du solde 4455', 'TVA non déclarée = cumul des écarts déclaratifs', S.cross),
+      chk(R.rasBal <= R.cfg.tol, 'Retenue à la source imputée', `Solde du compte ${R.cfg.p.ras}`, R.rasBal),
+      chk(!R.adv.some(a => a.missing > R.cfg.tol), 'TVA sur avances clients', 'Exigible à l\'encaissement', sum(R.adv, a => a.missing))))));
+}
+
+function renderDocs(R) {
+  const p = clear($('#p-docs'));
+  p.append(panelHead('Factures et avoirs de vente', 'Chaque pièce de vente : base HT, TVA comptabilisée, taux calculé, TVA théorique au taux légal et contrôles.'));
+  const sb = searchBox('Client, facture…'); const fC = h('select', { 'aria-label': 'Taux' }, h('option', { value: '' }, 'Tous taux'), R.rates.map(c => h('option', { value: c.cat }, c.cat)));
+  const fA = h('input', { type: 'checkbox' }); p.append(h('div', { class: 'toolbar' }, sb.el, fC, h('label', { class: 'ck' }, fA, 'Anomalies uniquement')));
+  const t = table([{ key: 'date', label: 'Date', date: true, nowrap: true }, { key: 'ref', label: 'Pièce', mono: true }, { key: 'kind', label: 'Type', render: r => badge(r.kind, r.kind === 'Avoir' ? 'warn' : 'mute') }, { key: 'client', label: 'Client' },
+    { key: 'vaccts', label: 'Compte de vente', mono: true }, { key: 'ht', label: 'HT', num: true, sum: true }, { key: 'tva', label: 'TVA', num: true, sum: true }, { key: 'ttc', label: 'TTC', num: true, sum: true },
+    { key: 'rate', label: 'Taux calculé', num: true, render: r => r.ht ? pctTxt(r.rate) : '' }, { key: 'cat', label: 'Taux retenu', render: r => badge(r.cat, r.flags.some(f => f.k === 'rate' || f.k === 'notva') ? 'ko' : r.exp ? 'info' : 'ok') },
+    { key: 'tacct', label: 'Compte TVA', mono: true }, { key: 'theo', label: 'TVA théorique', num: true, sum: true }, { key: 'ecart', label: 'Écart', num: true, sum: true },
+    { key: 'flags', label: 'Contrôles', nosort: true, wrap: true, render: r => r.flags.length ? r.flags.map(f => f.t).join(' · ') : badge('Conforme', 'ok') }], R.docs,
+    { totals: true, rowClass: r => r.flags.some(f => ['notva', 'rate'].includes(f.k)) ? 'ko' : r.flags.length ? 'warn' : null });
+  const apply = () => { const q = norm(sb.input.value); t.update(R.docs.filter(d => (!q || norm(d.ref + d.client + d.lib).includes(q)) && (!fC.value || d.cat === fC.value) && (!fA.checked || d.flags.length))); };
+  [sb.input, fC, fA].forEach(x => x.addEventListener('input', apply)); p.append(t);
+}
+
+function renderRates(R) {
+  const p = clear($('#p-rates'));
+  p.append(panelHead('Ventilation par taux et par compte', 'Cadrage CA × taux et contrôle de cohérence entre le taux appliqué et le compte de TVA utilisé.'));
+  p.append(h('div', { class: 'card sec' }, h('h3', null, 'Par taux'), table([{ key: 'cat', label: 'Taux', render: r => h('b', null, r.cat) }, { key: 'n', label: 'Pièces', num: true, render: r => String(r.n) }, { key: 'ht', label: 'CA HT', num: true, sum: true },
+    { key: 'tva', label: 'TVA comptabilisée', num: true, sum: true }, { key: 'eff', label: 'Taux effectif', num: true, render: r => r.ht ? pctTxt(r.eff) : '' }, { key: 'theo', label: 'TVA théorique', num: true, sum: true }, { key: 'ecart', label: 'Écart', num: true, sum: true, render: r => okBadge(r.ecart, R.cfg.tol) }], R.rates, { totals: true })));
+  p.append(h('div', { class: 'card sec' }, h('h3', null, 'Par compte de TVA facturée'), table([{ key: 'acct', label: 'Compte', mono: true }, { key: 'name', label: 'Intitulé' }, { key: 'rate', label: 'Taux dominant', render: r => r.rate != null ? pctTxt(r.rate) : '–' },
+    { key: 'an', label: 'À-nouveau', num: true, sum: true }, { key: 'fact', label: 'TVA facturée nette', num: true, sum: true }, { key: 'theo', label: 'TVA théorique', num: true, sum: true }, { key: 'other', label: 'Autres crédits', num: true, sum: true },
+    { key: 'decl', label: 'TVA déclarée (débits)', num: true, sum: true }, { key: 'solde', label: 'Solde', num: true, sum: true }], R.tvaAccts, { totals: true })));
+  p.append(h('div', { class: 'card sec' }, h('h3', null, 'Cadrage chiffre d\'affaires'), table([{ key: 'l', label: 'Élément', nosort: true }, { key: 'v', label: 'Montant', num: true, nosort: true }],
+    [{ l: 'CA comptable (comptes ' + R.cfg.p.ventes + ', hors à-nouveaux)', v: R.caGL }, { l: 'CA des factures et avoirs clients', v: R.caDocs }, { l: 'Écart (produits hors facturation client)', v: r2(R.caGL - R.caDocs) }])));
+}
+
+function renderEnc(R) {
+  const p = clear($('#p-enc'));
+  p.append(panelHead('Exigibilité de la TVA', R.cfg.regime === 'deb' ? 'Régime des débits : la TVA est exigible à la facturation. La liste des encaissements est donnée à titre d\'information.' : 'Régime de l\'encaissement : la TVA devient exigible à l\'encaissement du prix. Chaque règlement est rapproché des factures lettrées pour calculer la TVA qu\'il contient.'));
+  const sb = searchBox('Client, facture…'); const fP = h('select', { 'aria-label': 'Période' }, h('option', { value: '' }, 'Toutes périodes'), R.decl.map(x => h('option', { value: x.label }, x.name)));
+  p.append(h('div', { class: 'toolbar' }, sb.el, fP));
+  const t = table([{ key: 'date', label: 'Date', date: true, nowrap: true }, { key: 'per', label: 'Période' }, { key: 'client', label: 'Client' }, { key: 'refs', label: 'Factures réglées', mono: true },
+    { key: 'amount', label: 'Encaissé TTC', num: true, sum: true }, { key: 'ratio', label: 'TVA / TTC', num: true, render: r => pctTxt(r.ratio) }, { key: 'tva', label: 'TVA exigible', num: true, sum: true },
+    { key: 'ras', label: 'dont retenue à la source', num: true, sum: true }, { key: 'lettre', label: 'Lettrage', render: r => r.est ? badge('estimé', 'warn') : badge(r.lettre, 'mute') }], R.enc, { totals: true });
+  const apply = () => { const q = norm(sb.input.value); t.update(R.enc.filter(x => (!q || norm(x.client + x.refs + x.lib).includes(q)) && (!fP.value || x.per === fP.value))); };
+  [sb.input, fP].forEach(x => x.addEventListener('input', apply)); p.append(t);
+  if (R.adv.length) p.append(h('div', { class: 'card sec' }, h('h3', null, 'Avances et acomptes clients'), table([{ key: 'date', label: 'Date', date: true }, { key: 'lib', label: 'Libellé', wrap: true }, { key: 'amount', label: 'Montant encaissé', num: true, sum: true }, { key: 'tvaBooked', label: 'TVA comptabilisée', num: true, sum: true }, { key: 'theo', label: 'TVA théorique', num: true, sum: true }, { key: 'missing', label: 'TVA manquante', num: true, sum: true }], R.adv, { totals: true, rowClass: r => r.missing > R.cfg.tol ? 'ko' : null })));
+}
+
+function renderDecl(R) {
+  const p = clear($('#p-decl')); const c = R.cfg;
+  p.append(panelHead('Rapprochement avec les déclarations', 'La colonne jaune est modifiable : saisissez la TVA collectée figurant sur vos déclarations déposées. Les écarts, cumuls, graphiques et anomalies se recalculent instantanément.',
+    h('button', { class: 'btn btn-soft btn-sm', id: 'reset-inputs' }, '↺ Reprendre les montants du grand livre')));
+  p.append(h('div', { class: 'banner' }, '✏️ Cellules vivantes : tapez un montant puis Entrée ou Tab. Les montants saisis restent en mémoire jusqu\'au rechargement de la page ; rien n\'est enregistré ni transmis.'));
+  const wrap = h('div', { class: 'tablewrap' }); const tb = h('tbody');
+  const heads = ['Période', 'TVA facturée', 'TVA exigible', 'dont avances', 'TVA déclarée (GL)', 'TVA déclarée ✏️', 'Écart', 'Écart cumulé', 'Déductible imputée', 'RAS imputée', 'TVA nette due'];
+  wrap.append(h('table', null, h('thead', null, h('tr', null, heads.map((x, i) => h('th', { class: 'nosort' + (i ? ' num' : '') }, x)))), tb));
+  for (const r of R.decl) {
+    const inp = h('input', { class: 'live' + (r.edited ? ' changed' : ''), type: 'text', inputmode: 'decimal', value: NF.format(r.declared), 'aria-label': 'TVA déclarée ' + r.name, 'data-per': r.label });
+    inp.addEventListener('focus', () => { inp.value = String(r.declared).replace('.', ','); inp.select(); });
+    const commit = () => { const v = num(inp.value.replace(/\s/g, '')); if (!isFinite(v)) return; STATE.inputs[r.label] = r2(v); refocus = r.label; run(); };
+    inp.addEventListener('change', commit); inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); inp.blur(); } });
+    tb.append(h('tr', { class: Math.abs(r.ecart) > c.tol ? 'ko' : null }, h('td', null, h('b', null, r.name)), h('td', { class: 'num' }, fmt(r.fact)), h('td', { class: 'num' }, fmt(r.exig)), h('td', { class: 'num' }, fmt(r.advT)),
+      h('td', { class: 'num' }, fmt(r.declGL)), h('td', { class: 'num' }, inp), h('td', { class: 'num' }, okBadge(r.ecart, c.tol)), h('td', { class: 'num' }, fmt(r.cum)), h('td', { class: 'num' }, fmt(r.ded)), h('td', { class: 'num' }, fmt(r.rasImp)), h('td', { class: 'num' }, fmt(r.net))));
+  }
+  const T = R.totals; tb.append(h('tr', { class: 'tot' }, h('td', null, 'Total'), h('td', { class: 'num' }, fmt(sum(R.decl, x => x.fact))), h('td', { class: 'num' }, fmt(T.exig)), h('td', { class: 'num' }, fmt(sum(R.decl, x => x.advT))), h('td', { class: 'num' }, fmt(sum(R.decl, x => x.declGL))),
+    h('td', { class: 'num' }, fmt(T.declared)), h('td', { class: 'num' }, okBadge(T.ecart, c.tol)), h('td'), h('td', { class: 'num' }, fmt(sum(R.decl, x => x.ded))), h('td', { class: 'num' }, fmt(T.rasImp)), h('td', { class: 'num' }, fmt(sum(R.decl, x => x.net)))));
+  p.append(wrap, h('p', { class: 'foot' }, 'TVA exigible : ' + (c.regime === 'deb' ? 'TVA des factures de la période.' : 'TVA contenue dans les encaissements de la période (factures lettrées), plus la TVA comptabilisée sur les avances.') + ' TVA déclarée (GL) : débits du compte 4455 passés par les écritures de déclaration.'));
+  $('#reset-inputs', p).addEventListener('click', () => { STATE.inputs = {}; run(); toast('Montants déclarés repris du grand livre.', 'ok'); });
+  p.append(h('div', { class: 'card sec' }, h('h3', null, 'Rappel des règles'), h('div', { class: 'rules' },
+    h('div', { class: 'rule' }, h('b', null, 'Encaissement'), 'Régime de droit commun : la TVA est exigible lors de l\'encaissement total ou partiel du prix, y compris des avances (art. 95 CGI).'),
+    h('div', { class: 'rule' }, h('b', null, 'Débits'), 'Sur option : la TVA est exigible dès la facturation ou l\'inscription de la créance en comptabilité.'),
+    h('div', { class: 'rule' }, h('b', null, '20 % · 10 %'), 'Depuis 2026, deux taux : normal 20 % et réduit 10 % ; les exportations sont exonérées avec droit à déduction (art. 92). Paramétrable.'))));
+}
+let refocus = null;
+
+function renderSolde(R) {
+  const p = clear($('#p-solde')); const S = R.soldeRec;
+  p.append(panelHead('Cadrage du solde de TVA facturée', 'Le solde du compte 4455 doit correspondre à la TVA des créances clients non encore encaissées (régime de l\'encaissement), augmentée de la TVA exigible non déclarée.'));
+  p.append(h('div', { class: 'card sec' }, table([{ key: 'l', label: 'Reconstitution du solde', nosort: true, render: r => r.b ? h('b', null, r.l) : r.l }, { key: 'v', label: 'Montant', num: true, nosort: true, render: r => r.chk != null ? okBadge(r.v, R.cfg.tol) : r.b ? h('b', null, fmt(r.v)) : fmt(r.v) }],
+    [{ l: 'À-nouveau 4455 au début de la période', v: S.an }, { l: '+ TVA facturée nette (factures – avoirs)', v: S.fact }, { l: '+ TVA comptabilisée sur avances clients', v: S.advT }, { l: '+ Autres crédits 4455', v: S.other }, { l: '− TVA transférée par les déclarations', v: -S.decl },
+     { l: '= Solde reconstitué', v: S.calc, b: 1 }, { l: 'Solde du grand livre', v: R.solde, b: 1 }, { l: 'Écart de reconstitution', v: r2(S.calc - R.solde), chk: 1 }, { l: 'TVA contenue dans les créances non encaissées', v: S.latent }, { l: 'TVA exigible non déclarée (solde – TVA latente)', v: S.nonDecl, b: 1 },
+     { l: 'Cumul des écarts exigible – déclaré (grand livre)', v: S.cumGL }, { l: 'Cadrage croisé', v: S.cross, chk: 1 }])));
+  p.append(h('div', { class: 'card sec' }, h('h3', null, 'Créances clients non encaissées et TVA latente'), table([{ key: 'client', label: 'Client' }, { key: 'ref', label: 'Facture', mono: true }, { key: 'date', label: 'Date', date: true }, { key: 'an', label: 'Origine', render: r => r.an ? badge('À-nouveau', 'info') : '' },
+    { key: 'ttc', label: 'Reste dû TTC', num: true, sum: true }, { key: 'ratio', label: 'TVA / TTC', num: true, render: r => pctTxt(r.ratio) }, { key: 'tva', label: 'TVA non exigible', num: true, sum: true }], R.openTva, { totals: true })));
+}
+
+function renderRas(R) {
+  const p = clear($('#p-ras'));
+  p.append(panelHead('Retenue à la source sur la TVA', 'Certains clients (personnes morales de droit public, grandes entreprises…) retiennent 75 % ou 100 % de la TVA et la versent au Trésor. Elle doit être imputée sur votre déclaration du mois.'));
+  p.append(h('div', { class: 'kpis' }, kpi('Retenue subie', fmtK(R.totals.rasSub), 'MAD', `${R.rasLines.length} encaissement(s)`, 'sky', 'bank'), kpi('Retenue imputée', fmtK(R.totals.rasImp), 'MAD', 'Écritures de déclaration', 'mint', 'check'), kpi('Solde non imputé', fmt(R.rasBal), 'MAD', `Compte ${R.cfg.p.ras}`, 'rose', 'alert', R.rasBal > R.cfg.tol ? 'ko' : 'ok'), kpi('Encaissements concernés', fmtK(sum(R.enc.filter(e => e.ras > 0), e => e.amount)), 'MAD', 'TTC réglé', 'lav', 'coin')));
+  p.append(table([{ key: 'name', label: 'Période' }, { key: 'rasSub', label: 'Retenue subie', num: true, sum: true }, { key: 'rasImp', label: 'Retenue imputée', num: true, sum: true }, { key: 'rasEcart', label: 'Écart', num: true, sum: true, render: r => okBadge(r.rasEcart, R.cfg.tol) }], R.decl.filter(x => x.rasSub || x.rasImp), { totals: true, rowClass: r => Math.abs(r.rasEcart) > R.cfg.tol ? 'ko' : null }));
+}
+
+function renderAnos(R) {
+  const p = clear($('#p-anos'));
+  p.append(panelHead('Anomalies, risques et écritures proposées', 'Classées par enjeu. Les écritures sont des propositions à valider avant passation.'));
+  const SEV = { high: ['Élevé', 'ko'], mid: ['Moyen', 'warn'], low: ['Faible', 'info'], ok: ['Conforme', 'ok'] };
+  const list = h('div', { class: 'anos' }); const filt = h('div', { class: 'filters' }); let cur = '';
+  const draw = () => { clear(list); R.anos.filter(a => !cur || a.sev === cur).forEach((a, i) => list.append(h('article', { class: 'card ano s-' + a.sev }, h('div', { class: 'n' }, String(i + 1)),
+    h('div', null, h('h3', null, a.theme), h('p', null, a.constat), h('span', { class: 'lbl' }, 'Impact'), h('p', null, a.impact), h('span', { class: 'lbl' }, 'Recommandation'), h('p', null, a.reco)),
+    h('div', { class: 'right' }, badge(SEV[a.sev][0], SEV[a.sev][1]), a.montant != null ? h('div', { class: 'amt' }, fmt(a.montant)) : null, h('div', { class: 'ref' }, a.ref))))); };
+  [['', 'Tous'], ['high', 'Élevé'], ['mid', 'Moyen'], ['low', 'Faible'], ['ok', 'Conforme']].forEach(([k, l]) => { const n = k ? R.anos.filter(a => a.sev === k).length : R.anos.length; if (k && !n) return;
+    const b = h('button', { class: 'pill', 'aria-pressed': k === cur ? 'true' : 'false' }, `${l} (${n})`); b.addEventListener('click', () => { cur = k; [...filt.children].forEach(x => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); draw(); }); filt.append(b); });
+  draw(); p.append(filt, list);
+  const rows = []; R.ecr.forEach(e => e.lines.forEach((l, i) => rows.push({ ref: e.ref, acct: l.acct, lib: l.lib, d: l.d, c: l.c, just: i === 0 ? e.just : '' })));
+  if (rows.length) p.append(h('div', { class: 'card sec' }, h('h3', null, `Écritures de régularisation proposées au ${fmtD(R.gl.periodEnd)}`), table([{ key: 'ref', label: 'Réf.' }, { key: 'acct', label: 'Compte', mono: true }, { key: 'lib', label: 'Intitulé' }, { key: 'd', label: 'Débit', num: true, sum: true }, { key: 'c', label: 'Crédit', num: true, sum: true }, { key: 'just', label: 'Justification', wrap: true, nosort: true }], rows, { totals: true })));
+}
+
+function renderParams() {
+  const p = clear($('#p-params')); const c = STATE.cfg;
+  p.append(panelHead('Paramètres', 'Adaptez le régime, la périodicité, les taux et les comptes à votre plan comptable. Tout se recalcule à l\'application.'));
+  const F = (id, label, value, help, type = 'text') => h('div', { class: 'field' }, h('label', { for: id }, label), h('input', { id, type, value: value ?? '', autocomplete: 'off', spellcheck: 'false', step: type === 'number' ? 'any' : null }), help ? h('small', null, help) : null);
+  const sel = (id, label, opts, v, help) => h('div', { class: 'field' }, h('label', { for: id }, label), h('select', { id }, opts.map(([k, l]) => h('option', { value: k, selected: k === v || null }, l))), help ? h('small', null, help) : null);
+  p.append(h('div', { class: 'card sec' }, h('div', { class: 'form' },
+    sel('pr-regime', 'Fait générateur', [['enc', 'Encaissement (droit commun)'], ['deb', 'Débits (sur option)']], c.regime, 'Art. 95 CGI'), sel('pr-per', 'Périodicité', [['M', 'Mensuelle'], ['T', 'Trimestrielle']], c.periodicity),
+    F('pr-rates', 'Taux légaux (%)', c.rates, 'Séparés par des virgules'), F('pr-def', 'Taux par défaut (%)', c.defRate, 'À-nouveaux, ventes sans TVA, avances', 'number'), F('pr-tol', 'Tolérance d\'écart (MAD)', c.tol, '', 'number'),
+    F('pp-clients', 'Clients', c.p.clients), F('pp-avances', 'Avances clients', c.p.avances), F('pp-ventes', 'Comptes de ventes', c.p.ventes), F('pp-export', 'Ventes à l\'export', c.p.export, 'Exonérées (art. 92)'),
+    F('pp-tvaF', 'TVA facturée', c.p.tvaF), F('pp-tvaDue', 'TVA due', c.p.tvaDue), F('pp-tvaRec', 'TVA récupérable', c.p.tvaRec), F('pp-ras', 'TVA retenue à la source', c.p.ras), F('pp-banque', 'Trésorerie (préfixes)', c.p.banque, 'Séparés par des virgules')),
+    h('div', { class: 'form-actions' }, h('button', { class: 'btn btn-main', id: 'pr-apply' }, 'Appliquer et recalculer'), h('button', { class: 'btn', id: 'pr-reset' }, 'Valeurs par défaut'))));
+  $('#pr-apply', p).addEventListener('click', () => {
+    c.regime = $('#pr-regime').value === 'deb' ? 'deb' : 'enc'; c.periodicity = $('#pr-per').value === 'T' ? 'T' : 'M';
+    const rates = $('#pr-rates').value.replace(/[^0-9,.]/g, ''); if (!rates) { toast('Taux invalides.', 'err'); return; } c.rates = rates;
+    const dr = parseFloat($('#pr-def').value), tl = parseFloat($('#pr-tol').value); if (!(dr > 0 && dr < 100) || !(tl >= 0 && tl < 1e6)) { toast('Valeur numérique invalide.', 'err'); return; } c.defRate = dr; c.tol = tl;
+    for (const k of Object.keys(c.p)) { const v = $('#pp-' + k).value.replace(/[^0-9,]/g, '').slice(0, 80); if (!v) { toast('Préfixe vide : ' + k, 'err'); return; } c.p[k] = v; }
+    STATE.inputs = {}; if (STATE.gl) { run(); toast('Paramètres appliqués : analyse recalculée.', 'ok'); } else toast('Paramètres enregistrés.', 'ok');
+  });
+  $('#pr-reset', p).addEventListener('click', () => { STATE.cfg = JSON.parse(JSON.stringify(DEFAULT_CFG)); STATE.inputs = {}; renderParams(); if (STATE.gl) run(); });
+}
+
+function renderTabs(R) {
+  const nav = clear($('#tabs')); nav.classList.add('show');
+  const counts = { docs: R.docs.length, enc: R.enc.length, decl: R.decl.filter(x => Math.abs(x.ecart) > R.cfg.tol).length, anos: R.anos.filter(a => a.sev !== 'ok').length };
+  TABS.forEach(t => { const b = h('button', { class: 'tab', role: 'tab', id: 'tab-' + t.id, 'aria-controls': 'p-' + t.id, 'aria-selected': t.id === activeTab ? 'true' : 'false', tabindex: t.id === activeTab ? '0' : '-1' }, t.label,
+    counts[t.id] != null && (t.id !== 'decl' || counts.decl) ? h('span', { class: 'count' + ((t.id === 'anos' || t.id === 'decl') && counts[t.id] ? ' ko' : '') }, String(counts[t.id])) : null);
+    b.addEventListener('click', () => show(t.id));
+    b.addEventListener('keydown', ev => { const i = TABS.findIndex(x => x.id === t.id); if (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft') { ev.preventDefault(); const n = TABS[(i + (ev.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length]; show(n.id); $('#tab-' + n.id).focus(); } });
+    nav.append(b); });
+  show(activeTab);
+}
+function show(id) { activeTab = id; TABS.forEach(t => { const on = t.id === id; const b = $('#tab-' + t.id); if (b) { b.setAttribute('aria-selected', on ? 'true' : 'false'); b.tabIndex = on ? 0 : -1; } const pn = $('#p-' + t.id); pn.classList.toggle('show', on); pn.setAttribute('aria-labelledby', 'tab-' + t.id); }); }
+function renderFileInfo(R) {
+  const fi = clear($('#fileinfo')); fi.classList.add('show'); const chip = (l, v) => h('span', { class: 'chip' }, l, h('b', null, v));
+  fi.append(...[chip('Fichier ', STATE.file.name), chip('Société ', STATE.company || '—'), chip('Période ', `${fmtD(R.gl.periodStart)} → ${fmtD(R.gl.periodEnd)}`), chip('Écritures ', R.gl.entries.length.toLocaleString('fr-FR')), chip('Pièces de vente ', String(R.docs.length)),
+    STATE.file.demo ? badge('Démo – données fictives', 'info') : null, Object.keys(STATE.inputs).length ? badge(`${Object.keys(STATE.inputs).length} montant(s) saisi(s)`, 'warn') : null,
+    h('span', { class: 'badge ' + (Math.abs(R.soldeRec.calc - R.solde) < 0.05 ? 'b-ok' : 'b-ko') }, Math.abs(R.soldeRec.calc - R.solde) < 0.05 ? 'Solde 4455 reconstitué' : 'Écart de reconstitution')].filter(Boolean));
+  $('#subtitle').textContent = `${STATE.company || 'Société'} · ${fmtD(R.gl.periodStart)} – ${fmtD(R.gl.periodEnd)}`;
+}
+function run() {
+  const R = analyzeTVA(STATE.gl, STATE.cfg, STATE.inputs); STATE.R = R;
+  $('#empty').hidden = true; $('#hero').classList.add('compact'); $('#drop-title').textContent = 'Charger un autre grand livre'; $('#hero-title').textContent = 'Cadrage TVA facturée';
+  renderFileInfo(R); renderDash(R); renderDocs(R); renderRates(R); renderEnc(R); renderDecl(R); renderSolde(R); renderRas(R); renderAnos(R); renderParams(); renderTabs(R);
+  ['#btn-export', '#btn-print', '#btn-reset'].forEach(x => { $(x).disabled = false; });
+  if (refocus) { const i = document.querySelector(`input.live[data-per="${refocus}"]`); const all = [...document.querySelectorAll('input.live')]; const nx = all[all.indexOf(i) + 1] || i; refocus = null; if (nx) nx.focus(); }
+  announce(`Analyse : TVA facturée ${fmt(R.tvaDocs)}, écart déclaratif ${fmt(R.totals.ecart)}.`);
+}
+
+/* ============================ Chargement ============================ */
+async function loadBuffer(buf, nm, demo) {
+  const ext = (nm.split('.').pop() || '').toLowerCase(); const pr = $('#progress'); pr.classList.add('show'); $('#progress-txt').textContent = `Lecture de « ${nm} »…`;
+  try {
+    const sheets = ext === 'csv' ? readCsv(buf) : await readXlsx(buf);
+    $('#progress-txt').textContent = 'Cadrage de la TVA facturée…'; await new Promise(r => setTimeout(r, 30));
+    const gs = sheets.find(sh => findHeader(sh.rows) >= 0); if (!gs) throw new Error('Aucune feuille de grand livre reconnue (colonnes Date, Débit, Crédit).');
+    const gl = parseGL(gs.rows);
+    if (![...gl.accounts.keys()].some(a => sw(a, STATE.cfg.p.tvaF))) throw new Error(`Aucun compte de TVA facturée (${STATE.cfg.p.tvaF}…) dans ce grand livre. Vérifiez l'export ou les préfixes dans Paramètres.`);
+    STATE.gl = gl; STATE.file = { name: nm, sheet: gs.name, demo }; STATE.inputs = {};
+    const head = (gs.rows.slice(0, 6).flat().find(v => typeof v === 'string' && /SARL|S\.A|SA\b|SOCIETE/i.test(v)) || '');
+    STATE.company = demo ? 'LUMÉA DISTRIBUTION SARL (fictive)' : (head.split(/[–-]/)[0].trim().slice(0, 60) || (nm.split(/[_\-\s.]/).find(x => x && /^[A-Za-z]{3,}$/.test(x) && !/^(gl|grand|livre|au|du|xlsx|csv|tva|exemple)$/i.test(x)) || '').toUpperCase());
+    activeTab = 'dash'; run(); toast(`Grand livre chargé : ${gl.entries.length} écritures analysées.`, 'ok');
+  } catch (err) { console.error(err); toast(err && err.message ? err.message : 'Lecture impossible.', 'err'); }
+  finally { pr.classList.remove('show'); $('#file').value = ''; }
+}
+async function handleFile(file) {
+  if (!file) return; const ext = (file.name.split('.').pop() || '').toLowerCase();
+  if (!['xlsx', 'xlsm', 'csv'].includes(ext)) { toast('Format non pris en charge : utilisez un fichier .xlsx ou .csv (un .xls doit être réenregistré en .xlsx).', 'err'); return; }
+  if (file.size > LIMITS.fileBytes) { toast('Fichier trop volumineux (25 Mo maximum).', 'err'); return; } if (!file.size) { toast('Le fichier est vide.', 'err'); return; }
+  await loadBuffer(await file.arrayBuffer(), file.name, false);
+}
+async function loadDemo() {
+  try { const res = await fetch('Grand_livre_exemple_TVA.xlsx', { credentials: 'omit', cache: 'no-cache' }); if (!res.ok) throw new Error(); const buf = await res.arrayBuffer(); if (buf.byteLength > LIMITS.fileBytes) throw new Error(); await loadBuffer(buf, 'Grand_livre_exemple_TVA.xlsx', true); }
+  catch (_) { toast('Grand livre exemple introuvable : déposez « Grand_livre_exemple_TVA.xlsx » à côté de index.html (ou ouvrez la page via GitHub Pages).', 'err'); }
+}
+
+/* ============================ Export Excel ============================ */
+const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(u8) { let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC[(c ^ u8[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function zipStore(files) {
+  const enc = new TextEncoder(); const parts = [], central = []; let off = 0;
+  for (const [name, content] of files) { const nb = enc.encode(name), data = enc.encode(content), crc = crc32(data); const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint32(14, crc, true); lh.setUint32(18, data.length, true); lh.setUint32(22, data.length, true); lh.setUint16(26, nb.length, true);
+    parts.push(new Uint8Array(lh.buffer), nb, data); const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint32(16, crc, true); ch.setUint32(20, data.length, true); ch.setUint32(24, data.length, true); ch.setUint16(28, nb.length, true); ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), nb); off += 30 + nb.length + data.length; }
+  const cd = central.reduce((t, x) => t + x.length, 0); const end = new DataView(new ArrayBuffer(22));
+  end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, cd, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
+function colName(i) { let r = ''; i++; while (i > 0) { const m = (i - 1) % 26; r = String.fromCharCode(65 + m) + r; i = Math.floor((i - 1) / 26); } return r; }
+const FILLS = ['10B981', '84CC16', 'EAB308', 'F97316', 'EF4444', 'DB2777', '9333EA', '4C1D95'];
+const STYLES = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="3"><numFmt numFmtId="164" formatCode="#,##0.00;(#,##0.00);&quot;-&quot;"/><numFmt numFmtId="165" formatCode="0.0%"/><numFmt numFmtId="166" formatCode="dd/mm/yyyy"/></numFmts>
+<fonts count="4"><font><sz val="10"/><name val="Arial"/></font><font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Arial"/></font><font><b/><sz val="10"/><name val="Arial"/></font><font><b/><sz val="14"/><color rgb="FF8B7BE0"/><name val="Arial"/></font></fonts>
+<fills count="${3 + FILLS.length}"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF8B7BE0"/><bgColor indexed="64"/></patternFill></fill>${FILLS.map(c => `<fill><patternFill patternType="solid"><fgColor rgb="FF${c}"/><bgColor indexed="64"/></patternFill></fill>`).join('')}</fills>
+<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFD9D9E3"/></left><right style="thin"><color rgb="FFD9D9E3"/></right><top style="thin"><color rgb="FFD9D9E3"/></top><bottom style="thin"><color rgb="FFD9D9E3"/></bottom><diagonal/></border></borders>
+<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+<cellXfs count="${9 + FILLS.length}"><xf numFmtId="0" fontId="0" fillId="0" borderId="1" applyBorder="1"/><xf numFmtId="0" fontId="1" fillId="2" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment wrapText="1" vertical="center" horizontal="center"/></xf><xf numFmtId="164" fontId="0" fillId="0" borderId="1" applyNumberFormat="1" applyBorder="1"/><xf numFmtId="165" fontId="0" fillId="0" borderId="1" applyNumberFormat="1" applyBorder="1"/><xf numFmtId="166" fontId="0" fillId="0" borderId="1" applyNumberFormat="1" applyBorder="1"/><xf numFmtId="0" fontId="2" fillId="0" borderId="1" applyFont="1" applyBorder="1"/><xf numFmtId="164" fontId="2" fillId="0" borderId="1" applyNumberFormat="1" applyFont="1" applyBorder="1"/><xf numFmtId="0" fontId="3" fillId="0" borderId="0" applyFont="1"/><xf numFmtId="0" fontId="0" fillId="0" borderId="1" applyBorder="1" applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf>${FILLS.map((c, i) => `<xf numFmtId="0" fontId="1" fillId="${3 + i}" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment wrapText="1" vertical="center" horizontal="center"/></xf>`).join('')}</cellXfs>
+<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+function sheetXml(sh) {
+  const o = ['<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'];
+  o.push(sh.freeze ? `<sheetViews><sheetView workbookViewId="0" showGridLines="0"><pane ySplit="${sh.freeze}" topLeftCell="A${sh.freeze + 1}" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>` : '<sheetViews><sheetView workbookViewId="0" showGridLines="0"/></sheetViews>');
+  o.push('<cols>' + sh.widths.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`).join('') + '</cols><sheetData>');
+  sh.rows.forEach((row, ri) => { o.push(`<row r="${ri + 1}">`); row.forEach((cell, ci) => { if (cell == null) return; const c = typeof cell === 'object' ? cell : { v: cell }; const ref = colName(ci) + (ri + 1);
+    if (c.v == null || c.v === '') { if (c.s) o.push(`<c r="${ref}" s="${c.s}"/>`); return; }
+    if (c.date) { const serial = (isoToMs(c.v) - Date.UTC(1899, 11, 30)) / DAY; o.push(`<c r="${ref}" s="4"><v>${serial}</v></c>`); }
+    else if (typeof c.v === 'number') o.push(`<c r="${ref}" s="${c.s ?? (c.pct ? 3 : c.int ? 0 : 2)}"><v>${Number.isFinite(c.v) ? c.v : 0}</v></c>`);
+    else o.push(`<c r="${ref}" s="${c.s ?? 0}" t="inlineStr"><is><t xml:space="preserve">${xe(c.v)}</t></is></c>`); }); o.push('</row>'); });
+  o.push('</sheetData>'); if (sh.autoFilter) o.push(`<autoFilter ref="${sh.autoFilter}"/>`);
+  o.push('<pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.3" footer="0.3"/><pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/></worksheet>'); return o.join('');
+}
+function buildWorkbook(sheets) {
+  const f = [];
+  f.push(['[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheets.map((x, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`]);
+  f.push(['_rels/.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`]);
+  f.push(['xl/workbook.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheets.map((x, i) => `<sheet name="${xe(x.name.slice(0, 31))}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join('')}</sheets></workbook>`]);
+  f.push(['xl/_rels/workbook.xml.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((x, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join('')}<Relationship Id="rId${sheets.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`]);
+  f.push(['xl/styles.xml', STYLES]); sheets.forEach((x, i) => f.push([`xl/worksheets/sheet${i + 1}.xml`, sheetXml(x)])); return zipStore(f);
+}
+function tableSheet(name, title, sub, cols, rows, opts = {}) {
+  const out = [[{ v: title, s: 7 }], [sub], [], cols.map(c => ({ v: c.label, s: c.hs ?? 1 }))];
+  for (const r of rows) out.push(cols.map(c => { const v = c.get ? c.get(r) : r[c.key]; if (c.date) return v ? { v, date: true } : null; if (c.pct) return v == null ? null : { v, pct: true }; if (c.int) return v == null || v === '' ? null : { v, int: true }; if (c.num) return v == null || v === '' ? null : { v: r2(v) }; return { v: v ?? '', s: c.wrap ? 8 : 0 }; }));
+  if (opts.totals) out.push(cols.map((c, i) => i === 0 ? { v: 'TOTAL', s: 5 } : c.sum ? { v: r2(sum(rows, r => (c.get ? c.get(r) : r[c.key]) || 0)), s: 6 } : { v: '', s: 5 }));
+  return { name, rows: out, widths: cols.map(c => c.w || 14), freeze: 4, autoFilter: rows.length ? `A4:${colName(cols.length - 1)}${4 + rows.length}` : null };
+}
+
+function exportExcel() {
+  const R = STATE.R; if (!R) return; const co = STATE.company || 'Société'; const src = `Source : ${STATE.file.name} · période du ${fmtD(R.gl.periodStart)} au ${fmtD(R.gl.periodEnd)} · généré le ${new Date().toLocaleDateString('fr-FR')}${STATE.file.demo ? ' · DONNÉES FICTIVES' : ''}`;
+  const S = R.soldeRec, T = R.totals;
+  const syn = [[{ v: `${co} – Cadrage de la TVA facturée`, s: 7 }], [src], [], [{ v: 'Indicateur', s: 1 }, { v: 'Montant', s: 1 }, { v: 'Commentaire', s: 1 }],
+    ['CA HT comptable (classe 71)', { v: R.caGL }, ''], ['CA HT facturé (factures et avoirs)', { v: R.caDocs }, ''], ['TVA facturée comptabilisée', { v: R.tvaDocs }, ''], ['TVA théorique (HT × taux légal)', { v: R.tvaTheo }, ''], ['Écart TVA facturée – théorique', { v: r2(R.tvaDocs - R.tvaTheo) }, ''],
+    ['TVA exigible de la période', { v: T.exig }, R.cfg.regime === 'deb' ? 'Régime des débits' : 'Régime de l\'encaissement'], ['TVA déclarée', { v: T.declared }, Object.keys(STATE.inputs).length ? 'Inclut des montants saisis' : 'Grand livre'], ['Écart exigible – déclaré', { v: T.ecart }, ''],
+    ['Solde 4455', { v: R.solde }, ''], ['TVA sur créances non encaissées', { v: S.latent }, ''], ['TVA exigible non déclarée (cumul)', { v: S.nonDecl }, ''], ['Retenue à la source subie', { v: T.rasSub }, ''], ['Retenue à la source imputée', { v: T.rasImp }, ''], ['Solde retenue non imputée', { v: R.rasBal }, '']];
+  const sheets = [{ name: 'Synthèse', rows: syn, widths: [46, 20, 40] }];
+  sheets.push(tableSheet('Factures de vente', `${co} – Factures et avoirs`, src, [{ key: 'date', label: 'Date', date: true, w: 11 }, { key: 'ref', label: 'Pièce', w: 13 }, { key: 'kind', label: 'Type', w: 9 }, { key: 'client', label: 'Client', w: 26 }, { key: 'vaccts', label: 'Compte vente', w: 12 },
+    { key: 'ht', label: 'HT', num: true, sum: true }, { key: 'tva', label: 'TVA', num: true, sum: true }, { key: 'ttc', label: 'TTC', num: true, sum: true }, { key: 'rate', label: 'Taux calculé', pct: true, w: 9 }, { key: 'cat', label: 'Taux retenu', w: 16 }, { key: 'tacct', label: 'Compte TVA', w: 12 },
+    { key: 'theo', label: 'TVA théorique', num: true, sum: true }, { key: 'ecart', label: 'Écart', num: true, sum: true }, { key: 'fl', label: 'Contrôles', get: r => r.flags.map(f => f.t).join(' · ') || 'Conforme', w: 70, wrap: true }], R.docs, { totals: true }));
+  sheets.push(tableSheet('Ventilation taux', `${co} – Ventilation par taux`, src, [{ key: 'cat', label: 'Taux', w: 22 }, { key: 'n', label: 'Pièces', int: true, w: 8 }, { key: 'ht', label: 'CA HT', num: true, sum: true }, { key: 'tva', label: 'TVA comptabilisée', num: true, sum: true }, { key: 'theo', label: 'TVA théorique', num: true, sum: true }, { key: 'ecart', label: 'Écart', num: true, sum: true }], R.rates, { totals: true }));
+  sheets.push(tableSheet('Exigibilité', `${co} – Encaissements et TVA exigible`, src, [{ key: 'date', label: 'Date', date: true, w: 11 }, { key: 'per', label: 'Période', w: 9 }, { key: 'client', label: 'Client', w: 26 }, { key: 'refs', label: 'Factures', w: 22 }, { key: 'amount', label: 'Encaissé TTC', num: true, sum: true },
+    { key: 'ratio', label: 'TVA / TTC', pct: true, w: 9 }, { key: 'tva', label: 'TVA exigible', num: true, sum: true }, { key: 'ras', label: 'Retenue à la source', num: true, sum: true }, { key: 'lettre', label: 'Lettrage', get: r => r.est ? 'estimé' : r.lettre, w: 9 }], R.enc, { totals: true }));
+  sheets.push(tableSheet('Déclarations', `${co} – Rapprochement avec les déclarations`, src, [{ key: 'name', label: 'Période', w: 16 }, { key: 'fact', label: 'TVA facturée', num: true, sum: true }, { key: 'exig', label: 'TVA exigible', num: true, sum: true }, { key: 'advT', label: 'dont avances', num: true, sum: true },
+    { key: 'declGL', label: 'TVA déclarée (GL)', num: true, sum: true }, { key: 'declared', label: 'TVA déclarée retenue', num: true, sum: true }, { key: 'ecart', label: 'Écart', num: true, sum: true }, { key: 'cum', label: 'Écart cumulé', num: true },
+    { key: 'ded', label: 'Déductible imputée', num: true, sum: true }, { key: 'rasSub', label: 'RAS subie', num: true, sum: true }, { key: 'rasImp', label: 'RAS imputée', num: true, sum: true }, { key: 'net', label: 'TVA nette due', num: true, sum: true }], R.decl, { totals: true }));
+  const sold = [[{ v: `${co} – Cadrage du solde 4455`, s: 7 }], [src], [], [{ v: 'Élément', s: 1 }, { v: 'Montant', s: 1 }], ['À-nouveau 4455', { v: S.an }], ['TVA facturée nette', { v: S.fact }], ['TVA sur avances', { v: S.advT }], ['Autres crédits', { v: S.other }], ['TVA transférée par les déclarations', { v: -S.decl }],
+    [{ v: 'Solde reconstitué', s: 5 }, { v: S.calc, s: 6 }], [{ v: 'Solde grand livre', s: 5 }, { v: R.solde, s: 6 }], ['TVA sur créances non encaissées', { v: S.latent }], [{ v: 'TVA exigible non déclarée', s: 5 }, { v: S.nonDecl, s: 6 }], ['Cumul des écarts déclaratifs (GL)', { v: S.cumGL }], ['Cadrage croisé', { v: S.cross }], [],
+    [{ v: 'Client', s: 1 }, { v: 'Facture', s: 1 }, { v: 'Date', s: 1 }, { v: 'Reste dû TTC', s: 1 }, { v: 'TVA / TTC', s: 1 }, { v: 'TVA non exigible', s: 1 }], ...R.openTva.map(o => [o.client, o.ref, o.date ? { v: o.date, date: true } : '', { v: o.ttc }, { v: o.ratio, pct: true }, { v: o.tva }])];
+  sheets.push({ name: 'Solde 4455', rows: sold, widths: [40, 22, 12, 16, 10, 16] });
+  const SEV = { high: 'Élevé', mid: 'Moyen', low: 'Faible', ok: 'Conforme' };
+  sheets.push(tableSheet('Anomalies', `${co} – Anomalies et recommandations`, src, [{ key: 'n', label: 'N°', int: true, get: r => R.anos.indexOf(r) + 1, w: 5 }, { key: 'theme', label: 'Thème', w: 28, wrap: true }, { key: 'constat', label: 'Constat', w: 70, wrap: true }, { key: 'ref', label: 'Référence', w: 22, wrap: true },
+    { key: 'montant', label: 'Montant', num: true, w: 15 }, { key: 'impact', label: 'Impact', w: 48, wrap: true }, { key: 'sev', label: 'Niveau', get: r => SEV[r.sev], w: 10 }, { key: 'reco', label: 'Recommandation', w: 60, wrap: true }], R.anos));
+  const er = []; R.ecr.forEach(e => e.lines.forEach((l, i) => er.push({ ref: e.ref, acct: l.acct, lib: l.lib, d: l.d, c: l.c, just: i === 0 ? e.just : '' })));
+  sheets.push(tableSheet('Écritures proposées', `${co} – Écritures de régularisation proposées`, src, [{ key: 'ref', label: 'Réf.', w: 6 }, { key: 'acct', label: 'Compte', w: 14 }, { key: 'lib', label: 'Intitulé', w: 40 }, { key: 'd', label: 'Débit', num: true, sum: true }, { key: 'c', label: 'Crédit', num: true, sum: true }, { key: 'just', label: 'Justification', w: 50, wrap: true }], er, { totals: true }));
+  const blob = buildWorkbook(sheets); const url = URL.createObjectURL(blob); const a = h('a', { href: url, download: `${co.replace(/[^\w-]+/g, '_')}_Cadrage_TVA_facturee_${R.gl.periodEnd}.xlsx` });
+  document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000); toast('Classeur Excel généré (8 feuilles).', 'ok');
+}
+
+/* ============================ Événements ============================ */
+const drop = $('#drop'), input = $('#file');
+input.addEventListener('change', () => handleFile(input.files && input.files[0]));
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('drag'); }));
+drop.addEventListener('drop', e => handleFile(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]));
+window.addEventListener('dragover', e => e.preventDefault()); window.addEventListener('drop', e => e.preventDefault());
+$('#btn-demo').addEventListener('click', loadDemo);
+$('#btn-export').addEventListener('click', () => { try { exportExcel(); } catch (e) { console.error(e); toast('Export impossible : ' + e.message, 'err'); } });
+$('#btn-print').addEventListener('click', () => window.print());
+$('#btn-reset').addEventListener('click', () => {
+  STATE = { gl: null, R: null, file: null, cfg: JSON.parse(JSON.stringify(DEFAULT_CFG)), inputs: {}, company: '' };
+  TABS.forEach(t => clear($('#p-' + t.id)).classList.remove('show')); clear($('#tabs')).classList.remove('show'); clear($('#fileinfo')).classList.remove('show');
+  $('#empty').hidden = false; $('#hero').classList.remove('compact'); $('#drop-title').textContent = 'Déposez votre grand livre ici'; $('#hero-title').textContent = 'Votre TVA facturée, cadrée au centime';
+  $('#subtitle').textContent = 'TVA collectée · exigibilité · déclarations · retenue à la source'; ['#btn-export', '#btn-print', '#btn-reset'].forEach(x => { $(x).disabled = true; }); renderParams();
+  toast('Données effacées de la mémoire du navigateur.', 'ok');
+});
+const root = document.documentElement; const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+let theme = null; try { theme = localStorage.getItem('tvaf-theme'); } catch (_) {}
+root.setAttribute('data-theme', theme || (prefersDark ? 'dark' : 'light'));
+$('#btn-theme').addEventListener('click', () => { const t = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; root.setAttribute('data-theme', t); try { localStorage.setItem('tvaf-theme', t); } catch (_) {} });
+renderParams();
+})();
+</script>
+</body>
+</html>
